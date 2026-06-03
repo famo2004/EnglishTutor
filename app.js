@@ -1,29 +1,51 @@
 const micBtn = document.querySelector('.mic-btn');
 const statusText = document.querySelector('.status');
+const cardContainer = document.querySelector('.card-container');
 
-micBtn.addEventListener('click', async () => {
-    try {
-        // درخواست اجازه دسترسی به میکروفون
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        
-        // تغییر ظاهر به حالت در حال ضبط
-        statusText.innerHTML = "در حال شنیدن... 🔴";
-        statusText.style.color = "#ef4444"; 
-        statusText.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
-        statusText.style.borderColor = "rgba(239, 68, 68, 0.2)";
+// روشن کردن سیستم تشخیص صدای مرورگر
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.lang = 'en-US'; // تنظیم روی لهجه امریکن
 
-        // (در مراحل بعدی، کدهای ارسال صدا به گوگل استودیو اینجا قرار می‌گیره)
-        
-        // برای تست اولیه: میکروفون بعد از ۳ ثانیه خودکار قطع می‌شه
-        setTimeout(() => {
-            stream.getTracks().forEach(track => track.stop());
-            statusText.innerHTML = "صدا دریافت شد (آماده ارسال) ✓";
-            statusText.style.color = "#3b82f6";
-            statusText.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
-            statusText.style.borderColor = "rgba(59, 130, 246, 0.2)";
-        }, 3000);
-
-    } catch (err) {
-        alert("برای استفاده از این بخش باید دسترسی میکروفون رو به مرورگر بدی!");
-    }
+micBtn.addEventListener('click', () => {
+    recognition.start();
+    statusText.innerHTML = "در حال شنیدن... صحبت کن 🔴";
+    statusText.style.color = "#ef4444";
 });
+
+recognition.onresult = async (event) => {
+    const spokenText = event.results[0][0].transcript;
+    statusText.innerHTML = `شنیدم: "${spokenText}" - در حال تحلیل... ⏳`;
+    statusText.style.color = "#eab308";
+
+    try {
+        // ارسال متن به سرور امن نتلیفای
+        const response = await fetch('/.netlify/functions/api', {
+            method: 'POST',
+            body: JSON.stringify({ userInput: spokenText })
+        });
+
+        const data = await response.json();
+        const aiText = data.candidates[0].content.parts[0].text;
+        
+        // پیدا کردن فلش‌کارت از توی جواب هوش مصنوعی
+        const jsonMatch = aiText.match(/```json\n([\s\S]*?)\n```/) || aiText.match(/{[\s\S]*}/);
+        
+        if (jsonMatch) {
+            let jsonString = jsonMatch[0].replace(/```json/g, '').replace(/```/g, '');
+            const parsedData = JSON.parse(jsonString);
+            
+            if (parsedData.flashcards && parsedData.flashcards.length > 0) {
+                const card = parsedData.flashcards[0];
+                cardContainer.innerHTML = `
+                    <span class="english-word">${card.front}</span>
+                    <div class="persian-meaning">${card.back}</div>
+                `;
+            }
+            statusText.innerHTML = "تحلیل تمام شد! ✅";
+            statusText.style.color = "#10b981";
+        }
+    } catch (error) {
+        statusText.innerHTML = "خطا در ارتباط با سرور ❌";
+    }
+};
