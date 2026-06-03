@@ -4,12 +4,18 @@ exports.handler = async function(event, context) {
     const API_KEY = process.env.GEMINI_API_KEY;
 
     try {
-        const { userInput, userPath, file } = JSON.parse(event.body);
+        const { userInput, userPath, file, mistakes } = JSON.parse(event.body);
+        
+        // تبدیل لیست اشتباهات کاربر به یک رشته متنی برای درک هوش مصنوعی
+        const mistakesLog = (mistakes && mistakes.length > 0) 
+            ? `The user has previously made these mistakes: ${JSON.stringify(mistakes)}. You MUST include at least one practice challenge or quiz in your response testing them on these exact mistakes to reinforce their learning.` 
+            : ``;
 
         const systemPrompt = `You are a highly advanced English Tutor app.
-All explanations MUST be in Persian. 
+All your explanations MUST be in Persian (Farsi).
 The user is learning in this specific path: "${userPath}".
-If the user uploads a file, extract its content to teach them relevant grammar, vocabulary, or answer their questions.
+${mistakesLog}
+If the user uploads a file, extract its content to teach them relevant grammar or vocabulary.
 
 CRITICAL: You MUST output a JSON block at the very end of your response. Use this exact schema:
 {
@@ -26,14 +32,10 @@ CRITICAL: You MUST output a JSON block at the very end of your response. Use thi
   ]
 }`;
 
-        // آماده سازی پیام کاربر و فایل (در صورت وجود)
         let parts = [{ text: userInput }];
         if (file) {
             parts.push({
-                inlineData: {
-                    mimeType: file.mimeType,
-                    data: file.data
-                }
+                inlineData: { mimeType: file.mimeType, data: file.data }
             });
         }
 
