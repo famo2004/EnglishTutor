@@ -1,21 +1,29 @@
 exports.handler = async function(event, context) {
     if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
     
-    const API_KEY = process.env.GEMINI_API_KEY; // رمزی که تو نتلیفای وارد کردی
+    const API_KEY = process.env.GEMINI_API_KEY;
 
     try {
-        const { userInput } = JSON.parse(event.body);
+        const { userInput, userPath } = JSON.parse(event.body);
 
-        // پرامپت و شخصیت معلم تو
-        const systemPrompt = `You are a strict English tutor. Explain in Persian. 
-        Analyze the user's sentence. Correct grammar. 
-        Use vocabulary from daily routines, jobs, or weather, and blend them with examples from civil engineering, architecture, or Excel.
-        You MUST output a JSON block at the end like this:
-        {
-          "flashcards": [
-            {"front": "Corrected Sentence or New Word", "back": "Persian translation + Pronunciation"}
-          ]
-        }`;
+        const systemPrompt = `You are an advanced English Tutor. All explanations MUST be in Persian.
+Your core functionalities:
+1. The user's learning path is: "${userPath}". Adapt all examples to this path.
+2. Correct grammar and provide native alternatives.
+3. For any new vocabulary, idiom, grammar rule, or proverb you teach, create a flashcard.
+
+CRITICAL JSON OUTPUT:
+You MUST output a JSON block at the end of your response. Use this exact schema:
+{
+  "flashcards": [
+    {
+      "category": "word|idiom|grammar|proverb",
+      "front": "The English text",
+      "back": "Persian translation + English example",
+      "image_keyword": "A short English description of the word/idiom (no spaces, use underscores, e.g., red_apple or running_fast)"
+    }
+  ]
+}`;
 
         const requestBody = {
             system_instruction: { parts: [{ text: systemPrompt }] },
