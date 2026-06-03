@@ -1,85 +1,107 @@
-const micBtn = document.querySelector('.mic-btn');
-const statusText = document.querySelector('.status');
-const cardsContainer = document.getElementById('flashcardsContainer');
+// تب‌ها (جابجایی بین صفحات)
+function switchTab(tabId, element) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    element.classList.add('active');
+}
 
-// دریافت فلش‌کارت‌های قبلی از حافظه گوشی
+// تلفظ کلمات با کلیک (TTS)
+function speakText(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'en-US';
+    window.speechSynthesis.speak(speech);
+}
+
+// متغیر برای ذخیره فایل آپلود شده
+let uploadedFile = null;
+document.getElementById('fileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+        uploadedFile = { mimeType: file.type, data: reader.result.split(',')[1] };
+        alert('فایل با موفقیت بارگذاری شد! حالا یک جمله به هوش مصنوعی بگو تا از روی فایلت بهت درس بده.');
+    };
+});
+
+// لود کردن فلش کارت ها
 let savedCards = JSON.parse(localStorage.getItem('myFlashcards')) || [];
-
-// تابع نمایش کارت‌ها در صفحه
 function renderCards() {
-    cardsContainer.innerHTML = '';
+    const grid = document.getElementById('flashcardsGrid');
+    grid.innerHTML = '';
     savedCards.forEach(card => {
-        // استفاده از هوش مصنوعی ساخت عکس سریع (Pollinations)
-        const imageUrl = card.image_keyword ? `https://image.pollinations.ai/prompt/${card.image_keyword}` : 'https://image.pollinations.ai/prompt/abstract_learning_background';
-        
-        cardsContainer.innerHTML += `
+        const img = card.image_keyword ? `https://image.pollinations.ai/prompt/${card.image_keyword}?width=300&height=300` : 'https://image.pollinations.ai/prompt/learning?width=300';
+        grid.innerHTML += `
             <div class="card">
-                <span class="badge ${card.category}">${card.category}</span>
-                <img src="${imageUrl}" alt="AI Generated Image">
-                <h3 style="margin:5px 0;">${card.front}</h3>
-                <p style="color:#cbd5e1; font-size:14px;">${card.back}</p>
-            </div>
-        `;
+                <img src="${img}" alt="Flashcard Image">
+                <h3 style="margin:5px 0; font-family: Tahoma;">${card.front}</h3>
+                <p style="font-size:13px; color:#afafaf;">${card.back}</p>
+            </div>`;
     });
 }
 renderCards();
 
-// منطق اضافه کردن دستی کارت
-document.getElementById('saveManualBtn').addEventListener('click', () => {
-    const front = document.getElementById('manualFront').value;
-    const back = document.getElementById('manualBack').value;
-    const category = document.getElementById('manualCategory').value;
-    
-    if(front && back) {
-        // جایگزین کردن فاصله‌ها با خط تیره برای جستجوی عکس
-        const image_keyword = front.replace(/\s+/g, '_');
-        savedCards.unshift({ category, front, back, image_keyword });
-        localStorage.setItem('myFlashcards', JSON.stringify(savedCards));
-        renderCards();
-        document.getElementById('manualFront').value = '';
-        document.getElementById('manualBack').value = '';
-    }
-});
+// میکروفون و ارتباط با سرور
+const micBtn = document.getElementById('micBtn');
+const statusText = document.getElementById('statusText');
+const teachingBox = document.getElementById('teachingBox');
 
-// منطق میکروفون و دریافت کارت از هوش مصنوعی
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
 recognition.lang = 'en-US';
 
 micBtn.addEventListener('click', () => {
     recognition.start();
-    statusText.innerHTML = "در حال شنیدن... 🔴";
-    statusText.style.color = "#ef4444";
+    statusText.innerText = "در حال شنیدن... صحبت کن 🔴";
 });
 
 recognition.onresult = async (event) => {
     const spokenText = event.results[0][0].transcript;
-    statusText.innerHTML = "در حال تحلیل و ساخت عکس... ⏳";
-    statusText.style.color = "#eab308";
+    statusText.innerText = "در حال تحلیل... ⏳";
 
     try {
+        const payload = {
+            userInput: spokenText,
+            userPath: document.getElementById('pathSelect').value,
+            file: uploadedFile // ارسال فایل به سرور
+        };
+
         const response = await fetch('/.netlify/functions/api', {
             method: 'POST',
-            body: JSON.stringify({ userInput: spokenText, userPath: localStorage.getItem('userPath') || "General" })
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();
         const aiText = data.candidates[0].content.parts[0].text;
-        const jsonMatch = aiText.match(/```json\n([\s\S]*?)\n```/) || aiText.match(/{[\s\S]*}/);
         
+        // استخراج کدهای JSON
+        const jsonMatch = aiText.match(/```json\n([\s\S]*?)\n```/) || aiText.match(/{[\s\S]*}/);
         if (jsonMatch) {
             let parsedData = JSON.parse(jsonMatch[0].replace(/```json/g, '').replace(/```/g, ''));
             
-            if (parsedData.flashcards && parsedData.flashcards.length > 0) {
-                // اضافه کردن کارت‌های جدید هوش مصنوعی به لیست
+            // نمایش کلمات با فونتیک (سبک دولینگو)
+            if (parsedData.teaching_sentence) {
+                teachingBox.innerHTML = '<p style="font-size:14px; color:#58cc02; margin-bottom:15px;">برای شنیدن تلفظ روی کلمات کلیک کن:</p>';
+                parsedData.teaching_sentence.forEach(item => {
+                    teachingBox.innerHTML += `
+                    <div class="word-box" onclick="speakText('${item.word}')">
+                        <span class="en-word">${item.word}</span>
+                        <span class="ipa">${item.ipa}</span>
+                    </div>`;
+                });
+            }
+
+            // ذخیره فلش کارت ها
+            if (parsedData.flashcards) {
                 parsedData.flashcards.forEach(card => savedCards.unshift(card));
                 localStorage.setItem('myFlashcards', JSON.stringify(savedCards));
                 renderCards();
             }
-            statusText.innerHTML = "کارت‌های جدید اضافه شدند! ✅";
-            statusText.style.color = "#10b981";
+            statusText.innerText = "تحلیل تمام شد! ✅";
         }
     } catch (error) {
-        statusText.innerHTML = "خطا در ارتباط ❌";
+        statusText.innerText = "خطا در ارتباط با سرور ❌";
     }
 };

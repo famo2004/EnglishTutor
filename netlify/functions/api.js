@@ -4,30 +4,42 @@ exports.handler = async function(event, context) {
     const API_KEY = process.env.GEMINI_API_KEY;
 
     try {
-        const { userInput, userPath } = JSON.parse(event.body);
+        const { userInput, userPath, file } = JSON.parse(event.body);
 
-        const systemPrompt = `You are an advanced English Tutor. All explanations MUST be in Persian.
-Your core functionalities:
-1. The user's learning path is: "${userPath}". Adapt all examples to this path.
-2. Correct grammar and provide native alternatives.
-3. For any new vocabulary, idiom, grammar rule, or proverb you teach, create a flashcard.
+        const systemPrompt = `You are a highly advanced English Tutor app.
+All explanations MUST be in Persian. 
+The user is learning in this specific path: "${userPath}".
+If the user uploads a file, extract its content to teach them relevant grammar, vocabulary, or answer their questions.
 
-CRITICAL JSON OUTPUT:
-You MUST output a JSON block at the end of your response. Use this exact schema:
+CRITICAL: You MUST output a JSON block at the very end of your response. Use this exact schema:
 {
+  "teaching_sentence": [
+    {"word": "Hello", "ipa": "/həˈloʊ/"}
+  ],
   "flashcards": [
     {
-      "category": "word|idiom|grammar|proverb",
-      "front": "The English text",
-      "back": "Persian translation + English example",
-      "image_keyword": "A short English description of the word/idiom (no spaces, use underscores, e.g., red_apple or running_fast)"
+      "category": "word",
+      "front": "English word",
+      "back": "Persian translation",
+      "image_keyword": "A_single_english_keyword_for_image_search"
     }
   ]
 }`;
 
+        // آماده سازی پیام کاربر و فایل (در صورت وجود)
+        let parts = [{ text: userInput }];
+        if (file) {
+            parts.push({
+                inlineData: {
+                    mimeType: file.mimeType,
+                    data: file.data
+                }
+            });
+        }
+
         const requestBody = {
             system_instruction: { parts: [{ text: systemPrompt }] },
-            contents: [{ role: "user", parts: [{ text: userInput }] }]
+            contents: [{ role: "user", parts: parts }]
         };
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
