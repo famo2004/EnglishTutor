@@ -3,188 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>دستیار هوشمند زبان</title>
+    <title>زبان‌آموز هوشمند</title>
     <style>
-        /* =========================================
-           متغیرهای رنگی (برای پشتیبانی از تم تاریک و روشن)
-           ========================================= */
+        /* --- متغیرها و تم شیشه‌ای (بنفش/آبی) --- */
         :root {
             --bg-gradient: radial-gradient(circle at 30% 10%, #0a0f2a, #010314);
             --panel-bg: rgba(10, 20, 45, 0.75);
             --card-bg: rgba(20, 32, 60, 0.9);
             --text-color: #cce2ff;
             --title-color: #ffffff;
-            --border-color: rgba(60, 130, 255, 0.5);
+            --border-color: rgba(99, 102, 241, 0.5);
             --input-bg: rgba(12, 22, 48, 0.9);
-            --btn-grad-1: #2f4685;
-            --btn-grad-2: #19255c;
-            --error-color: #ff5a5a;
-        }
-
-        /* تم روشن */
-        body.light-theme {
-            --bg-gradient: radial-gradient(circle at 30% 10%, #e8f0fe, #cddcff);
-            --panel-bg: rgba(255, 255, 255, 0.85);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-color: #1a202c;
-            --title-color: #0f3460;
-            --border-color: rgba(59, 130, 246, 0.5);
-            --input-bg: rgba(240, 244, 248, 0.9);
-            --btn-grad-1: #3b82f6;
+            --btn-grad-1: #4f46e5;
             --btn-grad-2: #2563eb;
-            --error-color: #dc2626;
+            --correct-color: #4ade80;
+            --error-color: #f87171;
+            --highlight-color: rgba(99, 102, 241, 0.3);
         }
 
-        /* استایل‌های پایه */
+        body.light-theme {
+            --bg-gradient: radial-gradient(circle at 30% 10%, #eef2ff, #e0e7ff);
+            --panel-bg: rgba(255, 255, 255, 0.85); --card-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #1e1b4b; --title-color: #312e81; --border-color: rgba(99, 102, 241, 0.4);
+            --input-bg: rgba(243, 244, 246, 0.9); --btn-grad-1: #6366f1; --btn-grad-2: #3b82f6;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            background: var(--bg-gradient);
-            min-height: 100vh;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 16px;
-            padding-bottom: 80px; /* فضای خالی برای منوی پایین */
-            font-family: system-ui, -apple-system, Tahoma, sans-serif;
-            color: var(--text-color);
-            transition: background 0.4s ease;
-        }
-
-        .glass {
-            max-width: 750px; width: 100%; margin: 0 auto;
-            background: var(--panel-bg);
-            backdrop-filter: blur(20px);
-            border-radius: 40px;
-            border: 1px solid var(--border-color);
-            padding: 20px 18px;
-            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.15);
-            transition: all 0.4s ease;
-        }
+        body { background: var(--bg-gradient); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 16px; padding-bottom: 90px; font-family: system-ui, Tahoma, sans-serif; color: var(--text-color); transition: background 0.4s ease; }
+        .glass { max-width: 750px; width: 100%; margin: 0 auto; background: var(--panel-bg); backdrop-filter: blur(20px); border-radius: 40px; border: 1px solid var(--border-color); padding: 20px 18px; box-shadow: 0 20px 35px rgba(0, 0, 0, 0.15); transition: all 0.4s ease; }
 
         .header { text-align: center; margin-bottom: 18px; padding-bottom: 6px; border-bottom: 1px dashed var(--border-color); }
-        .header h1, .page-title {
-            font-size: clamp(1.1rem, 5vw, 1.4rem); font-weight: 800;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 15px;
-        }
+        .header h1, .page-title { font-size: clamp(1.1rem, 5vw, 1.4rem); font-weight: 800; background: linear-gradient(135deg, #8b5cf6, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 15px; }
 
-        /* شبکه‌بندی خدمات (منوی اصلی) */
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        .service-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 20px 10px;
-            text-align: center;
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: var(--text-color);
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
+        /* شبکه‌بندی خدمات */
+        .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .service-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px 10px; text-align: center; font-size: 0.85rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; }
         .service-card:active { transform: scale(0.95); }
-        .service-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+        .service-icon { font-size: 1.8rem; margin-bottom: 10px; display: block; }
 
-        /* باکس‌ها و اینپوت‌ها */
-        .config-card {
-            background: var(--card-bg); border-radius: 24px; padding: 15px;
-            margin-bottom: 15px; border: 1px solid var(--border-color);
-            font-size: 0.85rem; line-height: 1.8; transition: all 0.4s ease;
-        }
-        .search-box input, .search-box select {
-            width: 100%; background: var(--input-bg); border: 1.5px solid var(--border-color);
-            border-radius: 60px; padding: 12px 18px; font-size: 0.85rem; color: var(--text-color);
-            outline: none; margin-bottom: 15px; transition: all 0.4s ease;
-        }
-        .search-box input:focus { border-color: #3b82f6; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
-
-        /* دکمه‌ها */
-        .btn-slip {
-            width: 100%; padding: 12px 0; border-radius: 60px; font-size: 0.85rem; font-weight: 600;
-            background: linear-gradient(145deg, var(--btn-grad-1), var(--btn-grad-2));
-            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); border: none; color: white;
-            cursor: pointer; transition: 0.1s linear; margin-bottom: 10px;
-        }
+        /* باکس‌ها و دکمه‌ها */
+        .config-card { background: var(--card-bg); border-radius: 24px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); font-size: 0.85rem; line-height: 1.8; position: relative; }
+        .search-box input, .search-box select { width: 100%; background: var(--input-bg); border: 1.5px solid var(--border-color); border-radius: 20px; padding: 12px 18px; font-size: 0.85rem; color: var(--text-color); outline: none; margin-bottom: 10px; }
+        .btn-slip { width: 100%; padding: 12px 0; border-radius: 60px; font-size: 0.85rem; font-weight: 600; background: linear-gradient(145deg, var(--btn-grad-1), var(--btn-grad-2)); border: none; color: white; cursor: pointer; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
         .btn-slip:active { transform: scale(0.97); }
         .btn-stop { background: linear-gradient(145deg, #852f2f, #5c1919) !important; box-shadow: 0 0 10px rgba(246, 59, 59, 0.6) !important; }
-        .btn-back { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); box-shadow: none; margin-bottom: 20px;}
+        .btn-back { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); box-shadow: none; }
+        .btn-add { background: transparent; border: 1.5px dashed #3b82f6; color: #7aafff; border-radius: 20px; padding: 8px; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 5px; box-shadow: none;}
 
-        /* نوار ناوبری پایین (Bottom Nav) */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--panel-bg); backdrop-filter: blur(15px);
-            border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-around; padding: 12px 0;
-            z-index: 1000; padding-bottom: calc(12px + env(safe-area-inset-bottom));
-            transition: all 0.4s ease;
-        }
-        .nav-item {
-            background: none; border: none; color: var(--text-color);
-            font-size: 0.8rem; font-weight: 600; display: flex; flex-direction: column;
-            align-items: center; gap: 5px; cursor: pointer; opacity: 0.6; transition: 0.3s;
-        }
-        .nav-item.active { opacity: 1; color: #3b82f6; transform: translateY(-3px); }
-        .nav-icon { font-size: 1.4rem; }
+        /* نوار ناوبری پایین */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--panel-bg); backdrop-filter: blur(15px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+        .nav-item { background: none; border: none; color: var(--text-color); font-size: 0.75rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
+        .nav-item.active { opacity: 1; color: #8b5cf6; transform: translateY(-3px); }
 
-        /* صفحات اصلی */
-        .main-page { display: none; animation: fadeEffect 0.4s; }
+        /* صفحات */
+        .main-page { display: none; animation: fadeEffect 0.4s; width: 100%; }
         .main-page.active { display: block; }
         .feature-content { display: none; animation: fadeEffect 0.4s; }
         @keyframes fadeEffect { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
-
-        /* سایر استایل‌های قبلی (فلش کارت، آپلود و پاپ‌آپ) */
         .guide-text { font-size: 0.75rem; color: #88a4d4; text-align: center; margin-bottom: 15px; }
-        .upload-area { border: 2px dashed var(--border-color); border-radius: 24px; padding: 30px 20px; text-align: center; cursor: pointer; margin-bottom: 15px; }
-        .flashcard-container { perspective: 1000px; margin: 20px auto; width: 100%; height: 200px; }
-        .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        .help-icon { position: absolute; top: 15px; left: 15px; cursor: pointer; font-size: 1.2rem; filter: grayscale(100%); transition: 0.3s; z-index: 10;}
+        .help-icon:hover { filter: grayscale(0%); }
+
+        /* دراپ‌داون کاستوم با سرچ */
+        .dropdown-container { position: relative; width: 100%; margin-bottom: 15px; }
+        .dropdown-list { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 15px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .dropdown-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .dropdown-item:hover { background: var(--highlight-color); }
+
+        /* متون تعاملی (داستان و موزیک) */
+        .interactive-text { direction: ltr; text-align: left; font-size: 1.05rem; line-height: 2; padding: 10px; background: var(--input-bg); border-radius: 15px; margin-bottom: 10px; }
+        .interactive-text span { cursor: pointer; display: inline-block; padding: 0 2px; border-radius: 4px; transition: 0.2s; }
+        .interactive-text span:hover, .interactive-text span.clicked { background: var(--highlight-color); color: #a5b4fc; }
+        
+        .speaker-icon { cursor: pointer; font-size: 1.1rem; margin-right: 5px; vertical-align: middle; filter: drop-shadow(0 0 2px #3b82f6);}
+        .phonetic-sub { display: block; font-size: 0.65rem; color: #88a4d4; font-family: monospace; letter-spacing: 1px; }
+
+        /* فلش‌کارت */
+        .fc-category-nav { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; scrollbar-width: none; }
+        .fc-cat-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 14px; border-radius: 30px; font-size: 0.75rem; white-space: nowrap; cursor: pointer;}
+        .fc-cat-btn.active { background: linear-gradient(135deg, #3b82f6, #1e40af); color: white; border-color: #3b82f6; }
+        .flashcard-container { perspective: 1000px; width: 100%; height: 280px; margin-bottom: 15px; }
+        .flashcard { width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; position: relative; }
         .flashcard.flip { transform: rotateY(180deg); }
-        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; flex-direction: column; border-radius: 24px; border: 1.5px solid var(--border-color); font-size: 1.2rem; font-weight: bold; }
-        .flashcard-front { background: var(--input-bg); }
-        .flashcard-back { background: var(--input-bg); transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 30px; background: rgba(30, 60, 150, 0.3); backdrop-filter: blur(15px); border: 1px solid rgba(100, 150, 255, 0.4); padding: 20px; text-align: center; }
+        .flashcard-back { transform: rotateY(180deg); background: rgba(20, 40, 100, 0.4); }
+        .fc-image { width: 90px; height: 90px; object-fit: contain; margin-bottom: 10px; border-radius: 10px; }
+
+        /* دفتر اشتباهات */
+        .mistake-item { background: var(--input-bg); border-right: 4px solid var(--error-color); border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: left; direction: ltr; }
+        .wrong-part { color: var(--error-color); text-decoration: line-through; margin-right: 5px; }
+        .correct-part { color: var(--correct-color); font-weight: bold; }
+
+        /* پاپ‌آپ‌ها */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
+        .modal-content { background: rgba(10, 20, 45, 0.95); margin: 40% auto; padding: 25px; border: 1px solid var(--border-color); width: 85%; border-radius: 35px; text-align: center; }
+        
+        /* ویدیو/موزیک پلیر تعبیه‌شده */
+        .embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 15px; margin-bottom: 10px; }
+        .embed-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
     </style>
 </head>
 <body>
 
 <div class="glass">
-    <div class="header">
-        <h1>𓎂 زبان‌آموز هوشمند 𓎂</h1>
-    </div>
+    <div class="header"><h1>𓎂 زبان‌آموز هوشمند 𓎂</h1></div>
 
+    <!-- 1. تب خدمات -->
     <div id="ServicesPage" class="main-page active">
-        
         <div id="servicesGrid" class="services-grid">
-            <div class="service-card" onclick="openFeature('MicFeature')"><span class="service-icon">🎙️</span>دستیار صوتی</div>
-            <div class="service-card" onclick="openFeature('FlashcardFeature')"><span class="service-icon">🗂️</span>فلش‌کارت</div>
-            <div class="service-card" onclick="openFeature('UploadFeature')"><span class="service-icon">📂</span>آپلود و تحلیل</div>
-            <div class="service-card" onclick="openFeature('ConversationFeature')"><span class="service-icon">🗣️</span>مکالمه</div>
+            <div class="service-card" onclick="openFeature('UploadFeature')"><span class="service-icon">📂</span>آپلود و حوزه</div>
+            <div class="service-card" onclick="openFeature('ExercisesFeature')"><span class="service-icon">🏋️‍♂️</span>تمارین هوشمند</div>
+            <div class="service-card" onclick="openFeature('StoryMusicFeature')"><span class="service-icon">🎧</span>داستان و موزیک</div>
+            <div class="service-card" onclick="openFeature('FlashcardFeature')"><span class="service-icon">🗂️</span>فلش‌کارت‌ها</div>
+            <div class="service-card" onclick="openFeature('MicFeature')"><span class="service-icon">🎙️</span>صوتی و دیکشنری</div>
             <div class="service-card" onclick="openFeature('QuizFeature')"><span class="service-icon">📝</span>آزمون روزانه</div>
-            <div class="service-card" onclick="openFeature('StoryMusicFeature')"><span class="service-icon">📚</span>داستان و موزیک</div>
         </div>
 
         <div id="featureContainer" style="display: none;">
             <button class="btn-slip btn-back" onclick="closeFeature()">🔙 بازگشت به منوی خدمات</button>
 
+            <!-- 1.1 آپلود و انتخاب حوزه -->
+            <div id="UploadFeature" class="feature-content">
+                <div class="config-card">
+                    <span class="help-icon" onclick="showHelp('انتخاب حوزه', 'با انتخاب یک حوزه، تمام تمرین‌ها، داستان‌ها و موزیک‌های پیشنهادی بر اساس همان موضوع برای شما تنظیم می‌شوند.')">❔</span>
+                    <h2 class="page-title" style="font-size: 1rem;">حوزه یادگیری و فایل</h2>
+                    <p class="guide-text">حوزه مورد نظرت رو مشخص کن یا فایلی آپلود کن تا آموزش‌ها اختصاصی بشن.</p>
+                    
+                    <div class="dropdown-container">
+                        <div class="search-box" style="margin-bottom: 0;">
+                            <input type="text" id="categorySearch" placeholder="جستجوی حوزه (مثلاً عمران، آیلتس...)" onkeyup="filterCategories()" onfocus="document.getElementById('catList').style.display='block'">
+                        </div>
+                        <div id="catList" class="dropdown-list">
+                            <div class="dropdown-item" onclick="selectCategory('مهندسی عمران')">مهندسی عمران (Civil Engineering)</div>
+                            <div class="dropdown-item" onclick="selectCategory('آزمون آیلتس')">آزمون آیلتس (IELTS)</div>
+                            <div class="dropdown-item" onclick="selectCategory('فیلم و سریال')">فیلم و سریال (Movies & Series)</div>
+                            <div class="dropdown-item" onclick="selectCategory('موسیقی')">موسیقی (Music)</div>
+                            <div class="dropdown-item" onclick="selectCategory('مهاجرت و اقامت')">مهاجرت و اقامت (Immigration)</div>
+                            <div class="dropdown-item" onclick="selectCategory('مهندسی کامپیوتر')">مهندسی کامپیوتر (Computer Science)</div>
+                            <div class="dropdown-item" onclick="selectCategory('روزمره و تفریحی')">روزمره و تفریحی (Daily & Leisure)</div>
+                        </div>
+                    </div>
+
+                    <input type="file" id="fileUploader" style="display: none;">
+                    <div style="border: 2px dashed var(--border-color); padding: 20px; text-align: center; border-radius: 20px; cursor: pointer; margin-top: 15px;" onclick="document.getElementById('fileUploader').click()">
+                        <div style="font-size: 2rem;">📥</div>
+                        <div style="font-size: 0.8rem; margin-top: 5px;">آپلود جزوه یا ویس برای تحلیل</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1.2 تمارین هوشمند -->
+            <div id="ExercisesFeature" class="feature-content">
+                <div class="config-card">
+                    <span class="help-icon" onclick="showHelp('تمارین هوشمند', 'هوش مصنوعی فایل‌ها و حوزه انتخابی شما را بررسی کرده و تمرین‌های جای‌خالی، صوتی و تصویری مخصوص شما تولید می‌کند.')">❔</span>
+                    <h2 class="page-title" style="font-size: 1rem;">تمرین ترکیبی هوشمند</h2>
+                    <p class="guide-text">سوالات بر اساس کلماتی که بلد نبودی و حوزه‌ای که انتخاب کردی طراحی میشن.</p>
+                    <button class="btn-slip" onclick="generateExercise()">✨ شروع تمرین</button>
+                    <div id="exerciseOutput" class="config-card" style="background: var(--input-bg); border: none; display: none;"></div>
+                </div>
+            </div>
+
+            <!-- 1.3 داستان و موزیک -->
+            <div id="StoryMusicFeature" class="feature-content">
+                <div class="config-card">
+                    <span class="help-icon" onclick="showHelp('داستان و موزیک', 'متون و موزیک دقیقاً مرتبط با حوزه یادگیری شما لود می‌شوند. با کلیک روی هر کلمه انگلیسی، معنی آن را ببینید و آن را به لیست تمرینات خود اضافه کنید.')">❔</span>
+                    <h2 class="page-title" style="font-size: 1rem;">داستان و موزیک امروز</h2>
+                    <p class="guide-text">آهنگ و داستان زیر با توجه به حوزه شما پیشنهاد شده است. روی کلمات کلیک کنید!</p>
+                    
+                    <h3 style="font-size: 0.9rem; margin: 15px 0 5px; color: #a5b4fc;">📖 داستان کوتاه:</h3>
+                    <div id="storyContainer" class="interactive-text"></div>
+
+                    <h3 style="font-size: 0.9rem; margin: 25px 0 5px; color: #a5b4fc;">🎧 موزیک واقعی پیشنهادی:</h3>
+                    <p id="musicTitleDisplay" style="font-size: 0.8rem; color: #7aafff; margin-bottom: 10px; font-weight: bold; direction: ltr; text-align: left;"></p>
+                    
+                    <div id="musicPlayerContainer" class="embed-container"></div>
+                    
+                    <h4 style="font-size: 0.8rem; margin: 10px 0 5px; color: #a5b4fc;">📝 لیریک موزیک:</h4>
+                    <div id="lyricsContainer" class="interactive-text"></div>
+                </div>
+            </div>
+
+            <!-- 1.4 فلش‌کارت کامل -->
+            <div id="FlashcardFeature" class="feature-content">
+                <div class="config-card">
+                    <span class="help-icon" onclick="showHelp('فلش‌کارت‌ها', 'کارت‌ها توسط هوش مصنوعی ساخته میشن. با زدن روی کارت، معنی رو ببین. با دکمه + پایین می‌تونی کارت‌های خودت رو به اکانتت اضافه کنی.')">❔</span>
+                    <h2 class="page-title" style="font-size: 1rem;">فلش‌کارت‌های تصویری</h2>
+                    
+                    <div class="fc-category-nav">
+                        <button class="fc-cat-btn active" onclick="changeFcCategory('main', this)">📌 اصلی</button>
+                        <button class="fc-cat-btn" onclick="changeFcCategory('idioms', this)">🎭 اصطلاحات</button>
+                        <button class="fc-cat-btn" onclick="changeFcCategory('proverbs', this)">📜 ضرب‌المثل</button>
+                        <button class="fc-cat-btn" onclick="changeFcCategory('grammar', this)">📐 گرامری</button>
+                    </div>
+
+                    <div class="flashcard-container" onclick="document.getElementById('fcElement').classList.toggle('flip')">
+                        <div class="flashcard" id="fcElement">
+                            <div class="flashcard-front flashcard-face">
+                                <img src="" class="fc-image" id="fcImg">
+                                <div id="fcWord" style="font-size: 1.4rem; font-weight: bold; direction: ltr;">Loading...</div>
+                                <span id="fcPhonetic" class="phonetic-sub" style="margin-top: 5px;"></span>
+                                <span class="speaker-icon" onclick="event.stopPropagation(); playAudio(document.getElementById('fcWord').innerText)" style="margin-top:10px; font-size:1.5rem;">🔊</span>
+                            </div>
+                            <div class="flashcard-back flashcard-face">
+                                <span style="font-size: 0.8rem; margin-bottom: 10px; color: #e2e8f0;">معنی و کاربرد</span>
+                                <div id="fcMean" style="font-size: 1.1rem; font-weight: bold;">...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-slip" onclick="nextCard()" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6);">کارت بعدی 🔄</button>
+                    <button class="btn-slip btn-add" onclick="openAddFcModal()">➕ افزودن فلش‌کارت جدید به اکانت</button>
+                </div>
+            </div>
+
+            <!-- 1.5 دستیار صوتی و دیکشنری هوشمند -->
             <div id="MicFeature" class="feature-content">
                 <div class="config-card">
-                    <h2 class="page-title" style="font-size: 1rem;">دستیار صوتی و تحلیلگر</h2>
+                    <span class="help-icon" onclick="showHelp('دستیار صوتی', 'صحبت کنید، هوش مصنوعی صدای شما را تحلیل کرده و به انگلیسی برمی‌گرداند یا اشکالات آن را اصلاح می‌کند. تا ۱۰ دقیقه فرصت صحبت دارید.')">❔</span>
+                    <h2 class="page-title" style="font-size: 1rem;">دستیار صوتی هوشمند</h2>
                     <p class="guide-text">فارسی بگو انگلیسی بگیر، انگلیسی بگو اصلاح بشه.</p>
                     <button id="recordBtn" class="btn-slip" onclick="toggleRecording()">🔴 شروع ضبط صدا</button>
                     <p id="timerDisplay" style="text-align: center; font-size: 1.2rem; font-weight: bold; margin: 10px 0;">00:00</p>
-                    <div id="responseArea" class="config-card" style="background: var(--input-bg); border: none;">
-                        پاسخ هوش مصنوعی در اینجا نمایش داده می‌شود...
-                    </div>
+                    <div id="responseArea" class="config-card" style="background: var(--input-bg); border: none;">پاسخ هوش مصنوعی در اینجا نمایش داده می‌شود...</div>
                 </div>
+
                 <div class="config-card">
+                    <span class="help-icon" onclick="showHelp('دیکشنری', 'کلمه مورد نظر خود را در حالت‌های مختلف از جمله انگلیسی به انگلیسی جستجو کنید.')">❔</span>
                     <h2 class="page-title" style="font-size: 1rem;">دیکشنری هوشمند</h2>
                     <div class="search-box">
                         <select id="dictMode">
                             <option value="en-fa">انگلیسی به فارسی</option>
                             <option value="fa-en">فارسی به انگلیسی</option>
+                            <option value="en-en">انگلیسی به انگلیسی</option>
                         </select>
                         <input type="text" id="dictInput" placeholder="کلمه مورد نظر را وارد کنید...">
                     </div>
@@ -193,70 +243,44 @@
                 </div>
             </div>
 
-            <div id="FlashcardFeature" class="feature-content">
-                <div class="config-card">
-                    <h2 class="page-title" style="font-size: 1rem;">مرور فلش‌کارت‌ها</h2>
-                    <p class="guide-text">برای دیدن معنی، روی کارت کلیک کنید.</p>
-                    <div class="flashcard-container" onclick="flipCard()">
-                        <div class="flashcard" id="fcElement">
-                            <div class="flashcard-front" id="fcFront">
-                                <span style="font-size: 0.8rem; margin-bottom: 10px;">کلمه (Word)</span>Ubiquitous
-                            </div>
-                            <div class="flashcard-back" id="fcBack">
-                                <span style="font-size: 0.8rem; margin-bottom: 10px;">معنی (Meaning)</span>فراگیر
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-slip" onclick="nextCard()">کارت بعدی ➡️</button>
-                </div>
-            </div>
-
-            <div id="UploadFeature" class="feature-content">
-                <div class="config-card">
-                    <h2 class="page-title" style="font-size: 1rem;">تحلیلگر فایل و جزوه</h2>
-                    <input type="file" id="fileUploader" style="display: none;" onchange="handleFileSelect(event)">
-                    <div class="upload-area" onclick="document.getElementById('fileUploader').click()">
-                        <div style="font-size: 2.5rem; margin-bottom: 10px;">📥</div>
-                        <div id="uploadText">برای انتخاب فایل (PDF، عکس، ویس) کلیک کنید</div>
-                    </div>
-                    <button class="btn-slip" onclick="analyzeFile()">شروع تحلیل فایل ⚡</button>
-                    <div id="analysisOutput" class="config-card" style="background: var(--input-bg); border: none; display: none;"></div>
-                </div>
-            </div>
-
-            <div id="ConversationFeature" class="feature-content">
-                <div class="config-card">
-                    <h2 class="page-title" style="font-size: 1rem;">مکالمه روزانه</h2>
-                    <p class="guide-text">صحبت کن، با لهجه امریکن اصلاحت می‌کنم.</p>
-                    <button class="btn-slip">📞 شروع مکالمه</button>
-                    <div class="config-card" style="background: var(--input-bg); border: none;">تاریخچه مکالمه...</div>
-                </div>
-            </div>
-
+            <!-- 1.6 آزمون روزانه -->
             <div id="QuizFeature" class="feature-content">
                 <div class="config-card">
+                    <span class="help-icon" onclick="showHelp('آزمون روزانه', 'یک آزمون ۲۰ سوالی از بخش‌هایی که مشخص می‌کنید (گرامر، لغت، تلفظ) گرفته می‌شود.')">❔</span>
                     <h2 class="page-title" style="font-size: 1rem;">آزمون روزانه</h2>
+                    <p class="guide-text">آزمون جامع روزانه از لغاتی که تاکنون یاد گرفته‌اید.</p>
                     <div class="search-box">
-                        <select><option>گرامر</option><option>لغات</option></select>
+                        <select>
+                            <option>تمرکز روی گرامر</option>
+                            <option>تمرکز روی لغات</option>
+                            <option>تمرکز روی تلفظ</option>
+                        </select>
                     </div>
                     <button class="btn-slip">📝 شروع آزمون</button>
                 </div>
             </div>
-
-            <div id="StoryMusicFeature" class="feature-content">
-                <div class="config-card">
-                    <h2 class="page-title" style="font-size: 1rem;">📖 داستان امروز</h2>
-                    <div class="config-card" style="background: var(--input-bg); border: none; direction: ltr; text-align: left;">Today is a beautiful day.</div>
-                </div>
-            </div>
-
         </div>
     </div>
 
+    <!-- 2. دفتر اشتباهاتم -->
+    <div id="MistakesPage" class="main-page">
+        <div class="config-card">
+            <span class="help-icon" onclick="showHelp('دفتر اشتباهات', 'هر جا اشتباه کنی، هوش مصنوعی اون رو ثبت می‌کنه. برای دیدن اشتباهات مختص به خودت، باید وارد اکانتت بشی.')">❔</span>
+            <h2 class="page-title" style="font-size: 1.2rem; text-align: center;">دفتر اشتباهاتم 📓</h2>
+            <p class="guide-text">اشتباهات گرامری و کلماتی که نمیدونستی اینجا جمع میشن.</p>
+            <div id="mistakesContainer">
+                <!-- محتوای اشتباهات بر اساس اکانت کاربر لود می‌شود -->
+            </div>
+            <button class="btn-slip btn-add" onclick="alert('پنجره افزودن اشتباه دستی')">➕ افزودن اشتباه جدید دستی</button>
+        </div>
+    </div>
+
+    <!-- 3. پروفایل و ثبت‌نام -->
     <div id="ProfilePage" class="main-page">
+        <!-- فرم ورود/ثبت‌نام -->
         <div id="loginSection" class="config-card">
             <h2 class="page-title" style="font-size: 1.1rem; text-align: center;">ورود به حساب کاربری</h2>
-            <p class="guide-text">برای ذخیره پیشرفت خود وارد شوید.</p>
+            <p class="guide-text">با ثبت‌نام، تمام اشتباهات و پیشرفت شما روی این ایمیل در گوشی ذخیره می‌شود.</p>
             <div class="search-box">
                 <input type="email" id="userEmail" placeholder="ایمیل خود را وارد کنید...">
                 <input type="password" id="userPass" placeholder="رمز عبور...">
@@ -265,11 +289,11 @@
             <button class="btn-slip" onclick="handleLogin()">ورود / ثبت‌نام</button>
         </div>
 
+        <!-- داشبورد کاربر لاگین شده -->
         <div id="dashboardSection" class="config-card" style="display: none; text-align: center;">
             <div style="font-size: 3rem; margin-bottom: 10px;">👤</div>
-            <h2 class="page-title" style="font-size: 1.1rem;">خوش آمدید!</h2>
-            <p id="displayEmail" style="margin-bottom: 20px; color: #88a4d4;"></p>
-            
+            <h2 class="page-title">حساب کاربری شما</h2>
+            <p id="displayEmail" style="margin-bottom: 20px; color: #a5b4fc; font-weight: bold; font-family: monospace;"></p>
             <button class="btn-slip" onclick="toggleTheme()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); box-shadow: none;">🌓 تغییر تم (تاریک/روشن)</button>
             <button class="btn-slip btn-stop" onclick="handleLogout()">🚪 خروج از حساب کاربری</button>
         </div>
@@ -277,39 +301,156 @@
 
 </div>
 
+<!-- فوتر اجباری شما -->
+<footer style="width: 100%; text-align: center; padding: 15px; margin-bottom: 70px;">
+    <a href="https://t.me/Famo2004" target="_blank" style="text-decoration: none; color: #7aafff; font-family: Tahoma, sans-serif; font-weight: bold; letter-spacing: 2px;">𓎂 𝗙𝗔𝗧𝗘𝗠𝗘𝗛 𓎂</a>
+</footer>
+
+<!-- نوار ناوبری پایین -->
 <div class="bottom-nav">
-    <button class="nav-item active" onclick="switchMainTab('ServicesPage', this)">
-        <span class="nav-icon">🛠️</span>خدمات
-    </button>
-    <button class="nav-item" onclick="switchMainTab('ProfilePage', this)">
-        <span class="nav-icon">👤</span>پروفایل
-    </button>
+    <button class="nav-item active" onclick="switchMainTab('ServicesPage', this)"><span class="nav-icon">🛠️</span>خدمات</button>
+    <button class="nav-item" onclick="switchMainTab('MistakesPage', this)"><span class="nav-icon">📓</span>اشتباهاتم</button>
+    <button class="nav-item" onclick="switchMainTab('ProfilePage', this)"><span class="nav-icon">👤</span>پروفایل</button>
+</div>
+
+<!-- پاپ‌آپ راهنما -->
+<div id="helpModal" class="modal">
+    <div class="modal-content">
+        <h3 id="helpTitle" class="page-title" style="font-size: 1.1rem;">راهنما</h3>
+        <p id="helpDesc" style="font-size: 0.9rem; margin-bottom: 20px; line-height: 1.8; color: var(--text-color);"></p>
+        <button class="btn-slip" onclick="document.getElementById('helpModal').style.display='none'">متوجه شدم</button>
+    </div>
+</div>
+
+<!-- پاپ‌آپ معنی کلمات -->
+<div id="wordModal" class="modal">
+    <div class="modal-content">
+        <span class="speaker-icon" style="font-size:2.5rem; display:block; margin-bottom:10px;" id="modalSpeaker">🔊</span>
+        <h3 id="modalWord" class="page-title" style="font-size: 1.8rem; direction: ltr; margin-bottom: 5px;">Word</h3>
+        <p id="modalPhonetic" style="font-family: monospace; color: #a5b4fc; margin-bottom: 15px; letter-spacing: 1px;">/wɜːrd/</p>
+        <p id="modalMean" style="font-size: 1rem; margin-bottom: 20px; color: var(--text-color); border-top: 1px dashed var(--border-color); padding-top: 15px;">معنی کلمه...</p>
+        <button class="btn-slip" onclick="document.getElementById('wordModal').style.display='none'">متوجه شدم</button>
+    </div>
 </div>
 
 <script>
-    // === سیستم ناوبری تب‌های پایین ===
-    function switchMainTab(pageId, element) {
-        // تغییر کلاس active دکمه‌های پایین
-        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-        element.classList.add('active');
-        
-        // تغییر صفحات اصلی
-        document.querySelectorAll('.main-page').forEach(page => page.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-
-        // اگر رفتیم تو صفحه خدمات، حتما منوی گرید رو نشون بده (ریست کردن)
-        if(pageId === 'ServicesPage') {
-            closeFeature(); 
+    // === سیستم دیتابیس لوکال برای کاربران (Email/Password) ===
+    function checkLoginStatus() {
+        const currentUser = localStorage.getItem('currentUser');
+        if(currentUser) {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            document.getElementById('displayEmail').innerText = currentUser;
+            renderMistakes(); // لود کردن اشتباهات مختص همین کاربر
+        } else {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('mistakesContainer').innerHTML = '<p class="guide-text">برای ذخیره و مشاهده دفتر اشتباهات خود، ابتدا ثبت‌نام کرده یا وارد شوید.</p>';
         }
     }
 
-    // === باز و بسته کردن ابزارهای داخل صفحه خدمات ===
+    function handleLogin() {
+        const email = document.getElementById('userEmail').value.trim().toLowerCase();
+        const pass = document.getElementById('userPass').value;
+        const errorBox = document.getElementById('loginError');
+
+        if(!email || !pass) {
+            errorBox.innerText = "⚠️ ایمیل و رمز عبور را وارد کنید.";
+            errorBox.style.display = 'block';
+            return;
+        }
+
+        // فراخوانی دیتابیس کاربران از لوکال استوریج
+        let usersDB = JSON.parse(localStorage.getItem('usersDB') || '{}');
+
+        if(usersDB[email]) {
+            if(usersDB[email].password !== pass) {
+                errorBox.innerText = "⚠️ رمز عبور اشتباه است.";
+                errorBox.style.display = 'block';
+                return;
+            }
+        } else {
+            // ساخت اکانت جدید با یک اشتباه پیش‌فرض برای نمایش قالب
+            usersDB[email] = {
+                password: pass,
+                unknownWords: [],
+                mistakes: [
+                    { wrong: "He do not", correct: "He does not", sentence: "like apples." }
+                ],
+                theme: 'dark'
+            };
+            localStorage.setItem('usersDB', JSON.stringify(usersDB));
+        }
+
+        localStorage.setItem('currentUser', email);
+        errorBox.style.display = 'none';
+
+        if(usersDB[email].theme === 'light') {
+            document.body.classList.add('light-theme');
+        } else {
+            document.body.classList.remove('light-theme');
+        }
+        checkLoginStatus();
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('currentUser');
+        document.getElementById('userEmail').value = '';
+        document.getElementById('userPass').value = '';
+        document.body.classList.remove('light-theme');
+        checkLoginStatus();
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        const currentUser = localStorage.getItem('currentUser');
+        if(currentUser) {
+            let usersDB = JSON.parse(localStorage.getItem('usersDB'));
+            usersDB[currentUser].theme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+            localStorage.setItem('usersDB', JSON.stringify(usersDB));
+        }
+    }
+
+    function renderMistakes() {
+        const currentUser = localStorage.getItem('currentUser');
+        const container = document.getElementById('mistakesContainer');
+        if(!currentUser) return;
+
+        let usersDB = JSON.parse(localStorage.getItem('usersDB'));
+        let mistakes = usersDB[currentUser].mistakes || [];
+
+        if(mistakes.length === 0) {
+            container.innerHTML = '<p class="guide-text" style="color:var(--correct-color);">آفرین! تا الان اشتباهی نداشتی.</p>';
+            return;
+        }
+
+        container.innerHTML = mistakes.map(m => `
+            <div class="mistake-item">
+                <span class="speaker-icon" onclick="playAudio('${m.wrong} ${m.sentence}')">🔊</span>
+                <span class="wrong-part">${m.wrong}</span> <span style="color:var(--text-color);">${m.sentence}</span>
+                <div style="margin-top: 8px;"><span class="correct-part">${m.correct}</span></div>
+            </div>
+        `).join('');
+    }
+
+    window.onload = () => { checkLoginStatus(); };
+
+    // === مدیریت تب‌ها و پاپ‌آپ راهنما ===
+    function switchMainTab(pageId, element) {
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+        document.querySelectorAll('.main-page').forEach(page => page.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        if(pageId === 'ServicesPage') closeFeature(); 
+    }
+
     function openFeature(featureId) {
         document.getElementById('servicesGrid').style.display = 'none';
         document.getElementById('featureContainer').style.display = 'block';
-        
         document.querySelectorAll('.feature-content').forEach(fc => fc.style.display = 'none');
         document.getElementById(featureId).style.display = 'block';
+        
+        if(featureId === 'StoryMusicFeature') loadInteractiveText();
     }
 
     function closeFeature() {
@@ -317,65 +458,188 @@
         document.getElementById('servicesGrid').style.display = 'grid';
     }
 
-    // === سیستم احراز هویت (ساده شده با LocalStorage) ===
-    function checkLoginStatus() {
-        const savedEmail = localStorage.getItem('userEmail');
-        if(savedEmail) {
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('dashboardSection').style.display = 'block';
-            document.getElementById('displayEmail').innerText = savedEmail;
-        } else {
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('dashboardSection').style.display = 'none';
+    function showHelp(title, desc) {
+        document.getElementById('helpTitle').innerText = "راهنمای " + title;
+        document.getElementById('helpDesc').innerText = desc;
+        document.getElementById('helpModal').style.display = 'block';
+    }
+
+    // === دراپ‌داون سرچ دار (حوزه یادگیری) ===
+    function filterCategories() {
+        let input = document.getElementById('categorySearch').value.toLowerCase();
+        let items = document.getElementsByClassName('dropdown-item');
+        for (let i = 0; i < items.length; i++) {
+            let txtValue = items[i].textContent || items[i].innerText;
+            items[i].style.display = txtValue.toLowerCase().indexOf(input) > -1 ? "" : "none";
         }
     }
 
-    function handleLogin() {
-        const email = document.getElementById('userEmail').value;
-        const pass = document.getElementById('userPass').value;
-        const errorBox = document.getElementById('loginError');
+    function selectCategory(catName) {
+        document.getElementById('categorySearch').value = catName;
+        document.getElementById('catList').style.display = 'none';
+        localStorage.setItem('selectedCategory', catName);
+    }
+    
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.dropdown-container')) {
+            document.getElementById('catList').style.display = 'none';
+        }
+    });
+
+    // === سیستم دیتابیس موزیک‌های واقعی و داستان ===
+    const mockStoryDB = {
+        "مهندسی عمران": "The engineers had to reinforce the foundation. A strong anchor is essential for the building's stability against earthquakes.",
+        "آزمون آیلتس": "Academic success requires rigorous preparation. Candidates must familiarize themselves with complex vocabularies and diverse topics.",
+        "default": "Today is a beautiful day. I walked through the park and noticed the ubiquitous presence of nature, which made me feel serene."
+    };
+
+    const realMusicDB = [
+        {
+            category: "مهندسی عمران", title: "We Built This City - Starship",
+            embed: '<iframe src="https://www.youtube.com/embed/K1b8AhIsSYQ" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+            lyrics: "We built this city on rock and roll. Built this city, we built this city on rock and roll."
+        },
+        {
+            category: "فیلم و سریال", title: "My Heart Will Go On - Celine Dion",
+            embed: '<iframe src="https://www.youtube.com/embed/3gK_2XdjOdY" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+            lyrics: "Every night in my dreams I see you, I feel you. That is how I know you go on."
+        },
+        {
+            category: "default", title: "Someone Like You - Adele",
+            embed: '<iframe src="https://www.youtube.com/embed/hLQl3WQQoQ0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+            lyrics: "I heard that you are settled down. That you found a girl and you are married now."
+        }
+    ];
+
+    function loadInteractiveText() {
+        const cat = localStorage.getItem('selectedCategory') || 'default';
+        const storyText = mockStoryDB[cat] || mockStoryDB["default"];
+        renderInteractiveWords('storyContainer', storyText);
         
-        if(!email || !pass) {
-            errorBox.innerText = "⚠️ لطفاً ایمیل و رمز عبور را وارد کنید.";
-            errorBox.style.display = 'block';
+        const selectedMusic = realMusicDB.find(m => m.category === cat) || realMusicDB.find(m => m.category === "default");
+        document.getElementById('musicTitleDisplay').innerText = "🎵 " + selectedMusic.title;
+        document.getElementById('musicPlayerContainer').innerHTML = selectedMusic.embed;
+        renderInteractiveWords('lyricsContainer', selectedMusic.lyrics);
+    }
+
+    function renderInteractiveWords(containerId, text) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const words = text.split(/\s+/);
+        
+        words.forEach(word => {
+            if(!word) return;
+            let cleanWord = word.replace(/[.,!?]/g, ''); 
+            let span = document.createElement('span');
+            span.innerText = word + ' ';
+            span.onclick = () => {
+                span.classList.add('clicked');
+                handleUnknownWord(cleanWord);
+            };
+            container.appendChild(span);
+        });
+    }
+
+    // ذخیره کلمه ناشناس فقط برای کاربری که لاگین کرده
+    function handleUnknownWord(word) {
+        const currentUser = localStorage.getItem('currentUser');
+        if(!currentUser) {
+            openWordDefinition(word, `/${word}/`, "برای ذخیره این کلمه در لیست تمرینات، لطفاً ابتدا در پروفایل ثبت‌نام کنید.");
             return;
         }
-        
-        // ذخیره اطلاعات (شبیه‌سازی ورود موفق)
-        localStorage.setItem('userEmail', email);
-        errorBox.style.display = 'none';
-        checkLoginStatus();
+
+        let usersDB = JSON.parse(localStorage.getItem('usersDB'));
+        let userData = usersDB[currentUser];
+
+        if(!userData.unknownWords.includes(word.toLowerCase())) {
+            userData.unknownWords.push(word.toLowerCase());
+            localStorage.setItem('usersDB', JSON.stringify(usersDB));
+        }
+        openWordDefinition(word, `/${word}/`, "این کلمه به لیست کلمات ناشناس اکانت شما اضافه شد تا در تمارین بعدی دوره شود.");
     }
 
-    function handleLogout() {
-        localStorage.removeItem('userEmail');
-        document.getElementById('userEmail').value = '';
-        document.getElementById('userPass').value = '';
-        checkLoginStatus();
-    }
-
-    // === سیستم تم (تاریک/روشن) ===
-    function toggleTheme() {
-        document.body.classList.toggle('light-theme');
-        // ذخیره انتخاب کاربر
-        if(document.body.classList.contains('light-theme')) {
-            localStorage.setItem('theme', 'light');
+    // === سیستم تلفظ و پاپ‌آپ کلمات ===
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US'; 
+            window.speechSynthesis.speak(utterance);
         } else {
-            localStorage.setItem('theme', 'dark');
+            alert("مرورگر شما از تلفظ صوتی پشتیبانی نمی‌کند.");
         }
     }
 
-    // بررسی تم ذخیره شده در هنگام لود سایت
-    window.onload = () => {
-        checkLoginStatus();
-        if(localStorage.getItem('theme') === 'light') {
-            document.body.classList.add('light-theme');
-        }
+    function openWordDefinition(word, phonetic, mean) {
+        document.getElementById('modalWord').innerText = word;
+        document.getElementById('modalPhonetic').innerText = phonetic;
+        document.getElementById('modalMean').innerText = mean;
+        document.getElementById('modalSpeaker').onclick = () => playAudio(word);
+        document.getElementById('wordModal').style.display = 'block';
     }
 
-    // === توابع عملکردی ابزارها ===
+    // === فلش‌کارت ===
+    const fcData = {
+        main: [
+            { word: "Anchor Bolt", phonetic: "/ˈæŋ.kɚ boʊlt/", mean: "پیچ مهار (مورد استفاده در سازه‌های بنایی)", img: "https://cdn-icons-png.flaticon.com/512/3268/3268579.png" },
+            { word: "Boundary Element", phonetic: "/ˈbaʊn.dər.i ˈel.ə.mənt/", mean: "المان مرزی (در دیوار برشی)", img: "https://cdn-icons-png.flaticon.com/512/2830/2830311.png" }
+        ],
+        idioms: [{ word: "Under the weather", phonetic: "/ˈʌn.dɚ ðə ˈweð.ɚ/", mean: "احساس مریضی داشتن", img: "https://cdn-icons-png.flaticon.com/512/3003/3003467.png" }],
+        proverbs: [{ word: "Piece of cake", phonetic: "/piːs əv keɪk/", mean: "مثل آب خوردن (خیلی آسان)", img: "https://cdn-icons-png.flaticon.com/512/3067/3067300.png" }],
+        grammar: [{ word: "Present Perfect", phonetic: "/ˈprez.ənt ˈpɝː.fekt/", mean: "حال کامل", img: "https://cdn-icons-png.flaticon.com/512/4207/4207253.png" }]
+    };
+
+    let currentFcCategory = 'main';
+    let currentCardIndex = 0;
+
+    function loadFlashcard() {
+        const card = fcData[currentFcCategory][currentCardIndex];
+        if(!card) return;
+        document.getElementById('fcImg').src = card.img;
+        document.getElementById('fcWord').innerText = card.word;
+        document.getElementById('fcPhonetic').innerText = card.phonetic;
+        document.getElementById('fcMean').innerText = card.mean;
+    }
+
+    function changeFcCategory(cat, btn) {
+        document.querySelectorAll('.fc-cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFcCategory = cat;
+        currentCardIndex = 0;
+        document.getElementById('fcElement').classList.remove('flip');
+        setTimeout(loadFlashcard, 300);
+    }
+
+    function nextCard() {
+        document.getElementById('fcElement').classList.remove('flip');
+        currentCardIndex = (currentCardIndex + 1) % fcData[currentFcCategory].length;
+        setTimeout(loadFlashcard, 300);
+    }
     
-    // ضبط صدا با خطای لوکال
+    // لود کارت برای اولین بار اضافه شد به window.onload (در بالا) و اینجا به صورت مستقل
+    setTimeout(loadFlashcard, 500);
+
+    function openAddFcModal() { alert("پنجره افزودن کارت دستی باز شد"); }
+
+    // === تمارین هوشمند ===
+    function generateExercise() {
+        const outBox = document.getElementById('exerciseOutput');
+        const cat = localStorage.getItem('selectedCategory') || 'عمومی';
+        outBox.style.display = 'block';
+        outBox.innerHTML = `⏳ در حال طراحی تمرین ترکیبی بر اساس حوزه <b>${cat}</b>...`;
+        
+        setTimeout(() => {
+            outBox.innerHTML = `
+                <div style="text-align:left; direction:ltr; margin-bottom:15px; line-height: 2;">
+                    <span class="speaker-icon" onclick="playAudio('Translate the document.')">🔊</span>
+                    Translate the _________ document.
+                </div>
+                <input type="text" placeholder="کلمه جا افتاده را بنویسید..." style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border-color); background:transparent; color:white; margin-bottom:10px;">
+                <button class="btn-slip" onclick="alert('ثبت شد. در صورت غلط بودن به دفتر اشتباهات منتقل می‌شود.')" style="padding:8px;">ثبت پاسخ</button>
+            `;
+        }, 1500);
+    }
+
+    // === دستیار صوتی (تایمر دار) ===
     let timerInterval, seconds = 0, isRecording = false;
     function toggleRecording() {
         const btn = document.getElementById('recordBtn');
@@ -397,38 +661,22 @@
             btn.innerText = '🔴 شروع ضبط صدا'; 
             btn.classList.remove('btn-stop');
             out.innerHTML = "در حال پردازش...";
-            
-            // نمایش خطا مستقیماً در همین باکس (بدون بنر بالایی)
             setTimeout(() => {
-                out.innerHTML = `<span style="color: var(--error-color); font-weight: bold;">⚠️ خطا در ارتباط با سرور!</span><br> لطفاً وضعیت اینترنت و فیلترشکن خود را بررسی کنید.`;
+                out.innerHTML = `<span style="color: var(--error-color); font-weight: bold;">⚠️ خطا در ارتباط با سرور!</span><br> لطفاً وضعیت اینترنت را بررسی کنید.`;
             }, 2000);
         }
     }
 
-    // فلش کارت
-    function flipCard() { document.getElementById('fcElement').classList.toggle('flip'); }
-    function nextCard() {
-        document.getElementById('fcElement').classList.remove('flip');
-        setTimeout(() => {
-            document.getElementById('fcFront').innerHTML = '<span style="font-size: 0.8rem; margin-bottom: 10px;">کلمه (Word)</span>Ephemeral';
-            document.getElementById('fcBack').innerHTML = '<span style="font-size: 0.8rem; margin-bottom: 10px;">معنی (Meaning)</span>زودگذر';
-        }, 300);
-    }
-
-    // آپلود
-    function handleFileSelect(e) {
-        if(e.target.files[0]) document.getElementById('uploadText').innerHTML = `فایل انتخاب شد:<br><span style="color: #3b82f6;">${e.target.files[0].name}</span>`;
-    }
-    function analyzeFile() {
-        const outBox = document.getElementById('analysisOutput');
-        if(document.getElementById('fileUploader').files.length === 0) {
-            outBox.style.display = 'block';
-            outBox.innerHTML = `<span style="color: var(--error-color);">⚠️ لطفاً اول یک فایل انتخاب کنید.</span>`;
-            return;
+    // === دیکشنری هوشمند ===
+    function searchDict() {
+        const word = document.getElementById('dictInput').value;
+        const mode = document.getElementById('dictMode').value;
+        const output = document.getElementById('dictOutput');
+        if(word.trim() === "") {
+            output.innerText = "لطفاً کلمه‌ای وارد کنید.";
+        } else {
+            output.innerText = `در حال جستجو برای: "${word}" (${mode})...`;
         }
-        outBox.style.display = 'block';
-        outBox.innerHTML = "در حال تحلیل...";
-        setTimeout(() => { outBox.innerHTML = "متن‌ها با موفقیت استخراج و ترجمه شد."; }, 2000);
     }
 </script>
 </body>
