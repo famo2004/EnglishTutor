@@ -1,127 +1,435 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>دستیار هوشمند زبان</title>
-<link rel="stylesheet" href="style.css">
-<!-- لینک به فایل مانیفست برای قابلیت نصب به عنوان اپلیکیشن (PWA) -->
-<link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>دستیار هوشمند زبان</title>
+    <style>
+        /* =========================================
+           متغیرهای رنگی (برای پشتیبانی از تم تاریک و روشن)
+           ========================================= */
+        :root {
+            --bg-gradient: radial-gradient(circle at 30% 10%, #0a0f2a, #010314);
+            --panel-bg: rgba(10, 20, 45, 0.75);
+            --card-bg: rgba(20, 32, 60, 0.9);
+            --text-color: #cce2ff;
+            --title-color: #ffffff;
+            --border-color: rgba(60, 130, 255, 0.5);
+            --input-bg: rgba(12, 22, 48, 0.9);
+            --btn-grad-1: #2f4685;
+            --btn-grad-2: #19255c;
+            --error-color: #ff5a5a;
+        }
+
+        /* تم روشن */
+        body.light-theme {
+            --bg-gradient: radial-gradient(circle at 30% 10%, #e8f0fe, #cddcff);
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #1a202c;
+            --title-color: #0f3460;
+            --border-color: rgba(59, 130, 246, 0.5);
+            --input-bg: rgba(240, 244, 248, 0.9);
+            --btn-grad-1: #3b82f6;
+            --btn-grad-2: #2563eb;
+            --error-color: #dc2626;
+        }
+
+        /* استایل‌های پایه */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 16px;
+            padding-bottom: 80px; /* فضای خالی برای منوی پایین */
+            font-family: system-ui, -apple-system, Tahoma, sans-serif;
+            color: var(--text-color);
+            transition: background 0.4s ease;
+        }
+
+        .glass {
+            max-width: 750px; width: 100%; margin: 0 auto;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            border: 1px solid var(--border-color);
+            padding: 20px 18px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s ease;
+        }
+
+        .header { text-align: center; margin-bottom: 18px; padding-bottom: 6px; border-bottom: 1px dashed var(--border-color); }
+        .header h1, .page-title {
+            font-size: clamp(1.1rem, 5vw, 1.4rem); font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 15px;
+        }
+
+        /* شبکه‌بندی خدمات (منوی اصلی) */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .service-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-color);
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .service-card:active { transform: scale(0.95); }
+        .service-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+
+        /* باکس‌ها و اینپوت‌ها */
+        .config-card {
+            background: var(--card-bg); border-radius: 24px; padding: 15px;
+            margin-bottom: 15px; border: 1px solid var(--border-color);
+            font-size: 0.85rem; line-height: 1.8; transition: all 0.4s ease;
+        }
+        .search-box input, .search-box select {
+            width: 100%; background: var(--input-bg); border: 1.5px solid var(--border-color);
+            border-radius: 60px; padding: 12px 18px; font-size: 0.85rem; color: var(--text-color);
+            outline: none; margin-bottom: 15px; transition: all 0.4s ease;
+        }
+        .search-box input:focus { border-color: #3b82f6; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
+
+        /* دکمه‌ها */
+        .btn-slip {
+            width: 100%; padding: 12px 0; border-radius: 60px; font-size: 0.85rem; font-weight: 600;
+            background: linear-gradient(145deg, var(--btn-grad-1), var(--btn-grad-2));
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); border: none; color: white;
+            cursor: pointer; transition: 0.1s linear; margin-bottom: 10px;
+        }
+        .btn-slip:active { transform: scale(0.97); }
+        .btn-stop { background: linear-gradient(145deg, #852f2f, #5c1919) !important; box-shadow: 0 0 10px rgba(246, 59, 59, 0.6) !important; }
+        .btn-back { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); box-shadow: none; margin-bottom: 20px;}
+
+        /* نوار ناوبری پایین (Bottom Nav) */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--panel-bg); backdrop-filter: blur(15px);
+            border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-around; padding: 12px 0;
+            z-index: 1000; padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            transition: all 0.4s ease;
+        }
+        .nav-item {
+            background: none; border: none; color: var(--text-color);
+            font-size: 0.8rem; font-weight: 600; display: flex; flex-direction: column;
+            align-items: center; gap: 5px; cursor: pointer; opacity: 0.6; transition: 0.3s;
+        }
+        .nav-item.active { opacity: 1; color: #3b82f6; transform: translateY(-3px); }
+        .nav-icon { font-size: 1.4rem; }
+
+        /* صفحات اصلی */
+        .main-page { display: none; animation: fadeEffect 0.4s; }
+        .main-page.active { display: block; }
+        .feature-content { display: none; animation: fadeEffect 0.4s; }
+        @keyframes fadeEffect { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
+
+        /* سایر استایل‌های قبلی (فلش کارت، آپلود و پاپ‌آپ) */
+        .guide-text { font-size: 0.75rem; color: #88a4d4; text-align: center; margin-bottom: 15px; }
+        .upload-area { border: 2px dashed var(--border-color); border-radius: 24px; padding: 30px 20px; text-align: center; cursor: pointer; margin-bottom: 15px; }
+        .flashcard-container { perspective: 1000px; margin: 20px auto; width: 100%; height: 200px; }
+        .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        .flashcard.flip { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; flex-direction: column; border-radius: 24px; border: 1.5px solid var(--border-color); font-size: 1.2rem; font-weight: bold; }
+        .flashcard-front { background: var(--input-bg); }
+        .flashcard-back { background: var(--input-bg); transform: rotateY(180deg); }
+    </style>
 </head>
 <body>
 
-<!-- پاپ‌آپ راهنمای نصب برنامه (غیر اجباری) -->
-<div id="installModal" class="modal">
-<div class="modal-content">
-<span class="close-btn" onclick="closeModal('installModal')">×</span>
-<h2 class="page-title">راهنمای نصب اپلیکیشن</h2>
-<p>برای تجربه بهتر و استفاده راحت‌تر، این صفحه را به صفحه اصلی گوشی خود اضافه کنید (Add to Home Screen) تا مانند یک اپلیکیشن مستقل اجرا شود.</p>
-<button onclick="closeModal('installModal')" class="action-btn">متوجه شدم</button>
-</div>
+<div class="glass">
+    <div class="header">
+        <h1>𓎂 زبان‌آموز هوشمند 𓎂</h1>
+    </div>
+
+    <div id="ServicesPage" class="main-page active">
+        
+        <div id="servicesGrid" class="services-grid">
+            <div class="service-card" onclick="openFeature('MicFeature')"><span class="service-icon">🎙️</span>دستیار صوتی</div>
+            <div class="service-card" onclick="openFeature('FlashcardFeature')"><span class="service-icon">🗂️</span>فلش‌کارت</div>
+            <div class="service-card" onclick="openFeature('UploadFeature')"><span class="service-icon">📂</span>آپلود و تحلیل</div>
+            <div class="service-card" onclick="openFeature('ConversationFeature')"><span class="service-icon">🗣️</span>مکالمه</div>
+            <div class="service-card" onclick="openFeature('QuizFeature')"><span class="service-icon">📝</span>آزمون روزانه</div>
+            <div class="service-card" onclick="openFeature('StoryMusicFeature')"><span class="service-icon">📚</span>داستان و موزیک</div>
+        </div>
+
+        <div id="featureContainer" style="display: none;">
+            <button class="btn-slip btn-back" onclick="closeFeature()">🔙 بازگشت به منوی خدمات</button>
+
+            <div id="MicFeature" class="feature-content">
+                <div class="config-card">
+                    <h2 class="page-title" style="font-size: 1rem;">دستیار صوتی و تحلیلگر</h2>
+                    <p class="guide-text">فارسی بگو انگلیسی بگیر، انگلیسی بگو اصلاح بشه.</p>
+                    <button id="recordBtn" class="btn-slip" onclick="toggleRecording()">🔴 شروع ضبط صدا</button>
+                    <p id="timerDisplay" style="text-align: center; font-size: 1.2rem; font-weight: bold; margin: 10px 0;">00:00</p>
+                    <div id="responseArea" class="config-card" style="background: var(--input-bg); border: none;">
+                        پاسخ هوش مصنوعی در اینجا نمایش داده می‌شود...
+                    </div>
+                </div>
+                <div class="config-card">
+                    <h2 class="page-title" style="font-size: 1rem;">دیکشنری هوشمند</h2>
+                    <div class="search-box">
+                        <select id="dictMode">
+                            <option value="en-fa">انگلیسی به فارسی</option>
+                            <option value="fa-en">فارسی به انگلیسی</option>
+                        </select>
+                        <input type="text" id="dictInput" placeholder="کلمه مورد نظر را وارد کنید...">
+                    </div>
+                    <button onclick="searchDict()" class="btn-slip">🔍 جستجوی کلمه</button>
+                    <div id="dictOutput" class="config-card" style="background: var(--input-bg); border:none; margin-bottom:0;">معنی کلمه...</div>
+                </div>
+            </div>
+
+            <div id="FlashcardFeature" class="feature-content">
+                <div class="config-card">
+                    <h2 class="page-title" style="font-size: 1rem;">مرور فلش‌کارت‌ها</h2>
+                    <p class="guide-text">برای دیدن معنی، روی کارت کلیک کنید.</p>
+                    <div class="flashcard-container" onclick="flipCard()">
+                        <div class="flashcard" id="fcElement">
+                            <div class="flashcard-front" id="fcFront">
+                                <span style="font-size: 0.8rem; margin-bottom: 10px;">کلمه (Word)</span>Ubiquitous
+                            </div>
+                            <div class="flashcard-back" id="fcBack">
+                                <span style="font-size: 0.8rem; margin-bottom: 10px;">معنی (Meaning)</span>فراگیر
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-slip" onclick="nextCard()">کارت بعدی ➡️</button>
+                </div>
+            </div>
+
+            <div id="UploadFeature" class="feature-content">
+                <div class="config-card">
+                    <h2 class="page-title" style="font-size: 1rem;">تحلیلگر فایل و جزوه</h2>
+                    <input type="file" id="fileUploader" style="display: none;" onchange="handleFileSelect(event)">
+                    <div class="upload-area" onclick="document.getElementById('fileUploader').click()">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">📥</div>
+                        <div id="uploadText">برای انتخاب فایل (PDF، عکس، ویس) کلیک کنید</div>
+                    </div>
+                    <button class="btn-slip" onclick="analyzeFile()">شروع تحلیل فایل ⚡</button>
+                    <div id="analysisOutput" class="config-card" style="background: var(--input-bg); border: none; display: none;"></div>
+                </div>
+            </div>
+
+            <div id="ConversationFeature" class="feature-content">
+                <div class="config-card">
+                    <h2 class="page-title" style="font-size: 1rem;">مکالمه روزانه</h2>
+                    <p class="guide-text">صحبت کن، با لهجه امریکن اصلاحت می‌کنم.</p>
+                    <button class="btn-slip">📞 شروع مکالمه</button>
+                    <div class="config-card" style="background: var(--input-bg); border: none;">تاریخچه مکالمه...</div>
+                </div>
+            </div>
+
+            <div id="QuizFeature" class="feature-content">
+                <div class="config-card">
+                    <h2 class="page-title" style="font-size: 1rem;">آزمون روزانه</h2>
+                    <div class="search-box">
+                        <select><option>گرامر</option><option>لغات</option></select>
+                    </div>
+                    <button class="btn-slip">📝 شروع آزمون</button>
+                </div>
+            </div>
+
+            <div id="StoryMusicFeature" class="feature-content">
+                <div class="config-card">
+                    <h2 class="page-title" style="font-size: 1rem;">📖 داستان امروز</h2>
+                    <div class="config-card" style="background: var(--input-bg); border: none; direction: ltr; text-align: left;">Today is a beautiful day.</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="ProfilePage" class="main-page">
+        <div id="loginSection" class="config-card">
+            <h2 class="page-title" style="font-size: 1.1rem; text-align: center;">ورود به حساب کاربری</h2>
+            <p class="guide-text">برای ذخیره پیشرفت خود وارد شوید.</p>
+            <div class="search-box">
+                <input type="email" id="userEmail" placeholder="ایمیل خود را وارد کنید...">
+                <input type="password" id="userPass" placeholder="رمز عبور...">
+            </div>
+            <p id="loginError" style="color: var(--error-color); font-size: 0.8rem; text-align: center; display: none; margin-bottom: 10px;"></p>
+            <button class="btn-slip" onclick="handleLogin()">ورود / ثبت‌نام</button>
+        </div>
+
+        <div id="dashboardSection" class="config-card" style="display: none; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">👤</div>
+            <h2 class="page-title" style="font-size: 1.1rem;">خوش آمدید!</h2>
+            <p id="displayEmail" style="margin-bottom: 20px; color: #88a4d4;"></p>
+            
+            <button class="btn-slip" onclick="toggleTheme()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-color); box-shadow: none;">🌓 تغییر تم (تاریک/روشن)</button>
+            <button class="btn-slip btn-stop" onclick="handleLogout()">🚪 خروج از حساب کاربری</button>
+        </div>
+    </div>
+
 </div>
 
-<!-- بنر خطای ارتباط با سرور / فیلترشکن -->
-<div id="serverErrorBanner" class="error-banner" style="display: none;">
-خطا در ارتباط با سرور! لطفاً بررسی کنید که اینترنت متصل باشد و یا در صورت نیاز، فیلترشکن (VPN) خود را روشن کنید.
-<button onclick="hideError()" class="close-error">✖</button>
+<div class="bottom-nav">
+    <button class="nav-item active" onclick="switchMainTab('ServicesPage', this)">
+        <span class="nav-icon">🛠️</span>خدمات
+    </button>
+    <button class="nav-item" onclick="switchMainTab('ProfilePage', this)">
+        <span class="nav-icon">👤</span>پروفایل
+    </button>
 </div>
 
-<!-- منوی تب‌ها -->
-<nav class="tabs-nav">
-<button class="tablink active" onclick="openTab(event, 'MicTab')">🎙️ دستیار صوتی</button>
-<button class="tablink" onclick="openTab(event, 'ConversationTab')">🗣️ مکالمه روزانه</button>
-<button class="tablink" onclick="openTab(event, 'QuizTab')">📝 آزمون روزانه</button>
-<button class="tablink" onclick="openTab(event, 'StoryMusicTab')">📚 داستان و موزیک</button>
-</nav>
+<script>
+    // === سیستم ناوبری تب‌های پایین ===
+    function switchMainTab(pageId, element) {
+        // تغییر کلاس active دکمه‌های پایین
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+        
+        // تغییر صفحات اصلی
+        document.querySelectorAll('.main-page').forEach(page => page.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
 
-<!-- تب اول: میکروفون و دیکشنری -->
-<div id="MicTab" class="tabcontent" style="display: block;">
-<h2 class="page-title">دستیار صوتی و تحلیلگر هوشمند</h2>
+        // اگر رفتیم تو صفحه خدمات، حتما منوی گرید رو نشون بده (ریست کردن)
+        if(pageId === 'ServicesPage') {
+            closeFeature(); 
+        }
+    }
 
-<div class="mic-container">
-<p class="guide-text">می‌توانید تا ۱۰ دقیقه به فارسی یا انگلیسی صحبت کنید. (اگر فارسی بگویید انگلیسی تحویل می‌گیرید و اگر انگلیسی بگویید ایرادات شما اصلاح می‌شود)</p>
-<button id="recordBtn" class="action-btn record-btn">🔴 شروع ضبط</button>
-<p id="timerDisplay">00:00</p>
-<div id="responseArea" class="output-box">پاسخ هوش مصنوعی در اینجا نمایش داده می‌شود...</div>
-</div>
+    // === باز و بسته کردن ابزارهای داخل صفحه خدمات ===
+    function openFeature(featureId) {
+        document.getElementById('servicesGrid').style.display = 'none';
+        document.getElementById('featureContainer').style.display = 'block';
+        
+        document.querySelectorAll('.feature-content').forEach(fc => fc.style.display = 'none');
+        document.getElementById(featureId).style.display = 'block';
+    }
 
-<hr class="divider">
+    function closeFeature() {
+        document.getElementById('featureContainer').style.display = 'none';
+        document.getElementById('servicesGrid').style.display = 'grid';
+    }
 
-<!-- بخش دیکشنری -->
-<div class="dictionary-container">
-<h2 class="page-title">دیکشنری</h2>
-<div class="dict-controls">
-<select id="dictMode" class="dropdown">
-<option value="en-fa">انگلیسی به فارسی</option>
-<option value="fa-en">فارسی به انگلیسی</option>
-<option value="en-en">انگلیسی به انگلیسی</option>
-</select>
-<input type="text" id="dictInput" placeholder="کلمه مورد نظر را وارد کنید..." class="text-input">
-<button id="dictSearchBtn" class="action-btn">جستجو</button>
-</div>
-<div id="dictOutput" class="output-box">معنی کلمه...</div>
-</div>
-</div>
+    // === سیستم احراز هویت (ساده شده با LocalStorage) ===
+    function checkLoginStatus() {
+        const savedEmail = localStorage.getItem('userEmail');
+        if(savedEmail) {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            document.getElementById('displayEmail').innerText = savedEmail;
+        } else {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+        }
+    }
 
-<!-- تب دوم: مکالمه روزانه -->
-<div id="ConversationTab" class="tabcontent">
-<h2 class="page-title">مکالمه روزانه</h2>
-<p class="guide-text">هر چی تا الان یاد گرفتی بیا باهام دربارش صحبت کن! اگر اشتباه هم بگی برات اصلاحش می‌کنم. (پاسخ‌ها با لهجه امریکن پخش می‌شود)</p>
-<button id="startChatBtn" class="action-btn">📞 شروع مکالمه صوتی</button>
-<div id="chatHistory" class="chat-box"></div>
-</div>
+    function handleLogin() {
+        const email = document.getElementById('userEmail').value;
+        const pass = document.getElementById('userPass').value;
+        const errorBox = document.getElementById('loginError');
+        
+        if(!email || !pass) {
+            errorBox.innerText = "⚠️ لطفاً ایمیل و رمز عبور را وارد کنید.";
+            errorBox.style.display = 'block';
+            return;
+        }
+        
+        // ذخیره اطلاعات (شبیه‌سازی ورود موفق)
+        localStorage.setItem('userEmail', email);
+        errorBox.style.display = 'none';
+        checkLoginStatus();
+    }
 
-<!-- تب سوم: آزمون روزانه -->
-<div id="QuizTab" class="tabcontent">
-<h2 class="page-title">آزمون روزانه (۲۰ سوال)</h2>
-<div class="quiz-settings">
-<label>تعیین کنید ۵۰٪ سوالات از کدام بخش باشد؟</label>
-<select id="quizFocus" class="dropdown">
-<option value="grammar">گرامر (Grammar)</option>
-<option value="pronunciation">تلفظ (Pronunciation)</option>
-<option value="vocabulary">لغات (Vocabulary)</option>
-</select>
-<button id="generateQuizBtn" class="action-btn">شروع آزمون</button>
-</div>
-<div id="quizArea" class="output-box">سوالات جای خالی، تستی، تصویری و تشریحی در اینجا بارگذاری می‌شوند...</div>
-</div>
+    function handleLogout() {
+        localStorage.removeItem('userEmail');
+        document.getElementById('userEmail').value = '';
+        document.getElementById('userPass').value = '';
+        checkLoginStatus();
+    }
 
-<!-- تب چهارم: پیشنهاد داستان و موزیک -->
-<div id="StoryMusicTab" class="tabcontent">
-<h2 class="page-title">پیشنهاد داستان و موزیک روزانه</h2>
-<p class="guide-text">روی هر کلمه که معنی آن را نمی‌دانید کلیک کنید تا تلفظ، فونتیک و معنی فارسی آن را ببینید.</p>
+    // === سیستم تم (تاریک/روشن) ===
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        // ذخیره انتخاب کاربر
+        if(document.body.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+        } else {
+            localStorage.setItem('theme', 'dark');
+        }
+    }
 
-<div class="story-section">
-<h3 class="page-title">📖 کتاب داستان امروز</h3>
-<!-- کلمات در جاوا اسکریپت با تگ span پوشانده میشوند تا قابل کلیک باشند -->
-<div id="storyText" class="clickable-text">
-Today is a beautiful day to learn something new. The sun is shining brightly.
-</div>
-</div>
+    // بررسی تم ذخیره شده در هنگام لود سایت
+    window.onload = () => {
+        checkLoginStatus();
+        if(localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-theme');
+        }
+    }
 
-<hr class="divider">
+    // === توابع عملکردی ابزارها ===
+    
+    // ضبط صدا با خطای لوکال
+    let timerInterval, seconds = 0, isRecording = false;
+    function toggleRecording() {
+        const btn = document.getElementById('recordBtn');
+        const out = document.getElementById('responseArea');
+        if (!isRecording) {
+            isRecording = true; seconds = 0;
+            btn.innerText = '⏹️ توقف ضبط'; 
+            btn.classList.add('btn-stop');
+            out.innerHTML = "در حال گوش دادن...";
+            timerInterval = setInterval(() => {
+                seconds++;
+                let m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                let s = (seconds % 60).toString().padStart(2, '0');
+                document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+                if (seconds >= 600) toggleRecording();
+            }, 1000);
+        } else {
+            isRecording = false; clearInterval(timerInterval);
+            btn.innerText = '🔴 شروع ضبط صدا'; 
+            btn.classList.remove('btn-stop');
+            out.innerHTML = "در حال پردازش...";
+            
+            // نمایش خطا مستقیماً در همین باکس (بدون بنر بالایی)
+            setTimeout(() => {
+                out.innerHTML = `<span style="color: var(--error-color); font-weight: bold;">⚠️ خطا در ارتباط با سرور!</span><br> لطفاً وضعیت اینترنت و فیلترشکن خود را بررسی کنید.`;
+            }, 2000);
+        }
+    }
 
-<div class="music-section">
-<h3 class="page-title">🎵 موزیک امروز (همراه با متن)</h3>
-<audio id="dailyMusic" controls class="audio-player">
-<source src="" type="audio/mpeg">
-مرورگر شما از پخش صدا پشتیبانی نمی‌کند.
-</audio>
-<div id="musicLyrics" class="clickable-text">
-I can see clearly now the rain is gone.
-</div>
-</div>
-</div>
+    // فلش کارت
+    function flipCard() { document.getElementById('fcElement').classList.toggle('flip'); }
+    function nextCard() {
+        document.getElementById('fcElement').classList.remove('flip');
+        setTimeout(() => {
+            document.getElementById('fcFront').innerHTML = '<span style="font-size: 0.8rem; margin-bottom: 10px;">کلمه (Word)</span>Ephemeral';
+            document.getElementById('fcBack').innerHTML = '<span style="font-size: 0.8rem; margin-bottom: 10px;">معنی (Meaning)</span>زودگذر';
+        }, 300);
+    }
 
-<!-- پاپ آپ نمایش معنی کلمات (مخصوص داستان و موزیک) -->
-<div id="wordPopup" class="word-popup" style="display: none;">
-<span class="close-popup" onclick="closeWordPopup()">✖</span>
-<h3 id="popupWord" class="page-title">Word</h3>
-<p id="popupPhonetic">/wɜːrd/</p>
-<p id="popupMeaning">کلمه، واژه</p>
-<button id="popupPronounce" class="action-btn small-btn">🔊 تلفظ</button>
-</div>
-
-<script src="script.js"></script>
+    // آپلود
+    function handleFileSelect(e) {
+        if(e.target.files[0]) document.getElementById('uploadText').innerHTML = `فایل انتخاب شد:<br><span style="color: #3b82f6;">${e.target.files[0].name}</span>`;
+    }
+    function analyzeFile() {
+        const outBox = document.getElementById('analysisOutput');
+        if(document.getElementById('fileUploader').files.length === 0) {
+            outBox.style.display = 'block';
+            outBox.innerHTML = `<span style="color: var(--error-color);">⚠️ لطفاً اول یک فایل انتخاب کنید.</span>`;
+            return;
+        }
+        outBox.style.display = 'block';
+        outBox.innerHTML = "در حال تحلیل...";
+        setTimeout(() => { outBox.innerHTML = "متن‌ها با موفقیت استخراج و ترجمه شد."; }, 2000);
+    }
+</script>
 </body>
 </html>
