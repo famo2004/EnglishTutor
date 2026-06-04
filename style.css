@@ -1,0 +1,212 @@
+/* تنظیمات پایه - حفظ تم دارک و فونت‌ها /
+:root {
+--bg-color: #1a1a2e;
+--panel-bg: #16213e;
+--primary-color: #0f3460;
+--accent-color: #e94560;
+--text-color: #e0e0e0;
+--title-color: #ffffff; / رنگ سفید برای تیترها */
+}
+
+body {
+font-family: Tahoma, 'Segoe UI', Geneva, Verdana, sans-serif;
+background-color: var(--bg-color);
+color: var(--text-color);
+margin: 0;
+padding: 0;
+direction: rtl;
+line-height: 1.6;
+}
+
+/* سفید کردن تمامی تیترها طبق درخواست شما */
+h1, h2, h3, h4, h5, h6, .page-title {
+color: var(--title-color) !important;
+}
+
+/* بنر خطا */
+.error-banner {
+background-color: #d32f2f;
+color: white;
+padding: 15px;
+text-align: center;
+position: sticky;
+top: 0;
+z-index: 1000;
+font-weight: bold;
+}
+.close-error {
+background: none;
+border: none;
+color: white;
+font-size: 18px;
+float: left;
+cursor: pointer;
+}
+
+/* استایل تب‌ها */
+.tabs-nav {
+display: flex;
+overflow-x: auto;
+background-color: var(--panel-bg);
+border-bottom: 2px solid var(--primary-color);
+}
+.tablink {
+background-color: inherit;
+color: white;
+border: none;
+outline: none;
+cursor: pointer;
+padding: 14px 16px;
+flex: 1;
+min-width: 120px;
+transition: 0.3s;
+font-size: 14px;
+}
+.tablink:hover {
+background-color: var(--primary-color);
+}
+.tablink.active {
+background-color: var(--accent-color);
+font-weight: bold;
+}
+.tabcontent {
+display: none;
+padding: 20px;
+animation: fadeEffect 0.5s;
+}
+
+@keyframes fadeEffect {
+from {opacity: 0;}
+to {opacity: 1;}
+}
+
+/* دکمه‌ها و ورودی‌ها */
+.action-btn {
+background-color: var(--accent-color);
+color: white;
+border: none;
+padding: 10px 20px;
+border-radius: 8px;
+cursor: pointer;
+font-size: 16px;
+margin: 5px 0;
+transition: 0.3s;
+}
+.action-btn:hover {
+opacity: 0.8;
+}
+.small-btn {
+padding: 5px 10px;
+font-size: 14px;
+}
+.record-btn {
+width: 100%;
+padding: 15px;
+font-size: 18px;
+}
+
+.text-input, .dropdown {
+width: 100%;
+padding: 12px;
+margin: 10px 0;
+border-radius: 8px;
+border: 1px solid #444;
+background-color: #2a2a4a;
+color: white;
+box-sizing: border-box;
+}
+
+/* باکس‌های خروجی و چت */
+.output-box, .chat-box {
+background-color: var(--panel-bg);
+padding: 15px;
+border-radius: 10px;
+min-height: 100px;
+margin-top: 15px;
+border: 1px solid var(--primary-color);
+}
+
+.guide-text {
+font-size: 14px;
+color: #b0b0b0;
+}
+
+.divider {
+border: 0;
+height: 1px;
+background: #444;
+margin: 30px 0;
+}
+
+/* پاپ‌آپ (Modal) راهنمای نصب /
+.modal {
+display: none; / توسط جاوا اسکریپت نمایش داده می‌شود */
+position: fixed;
+z-index: 2000;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0,0,0,0.8);
+}
+.modal-content {
+background-color: var(--panel-bg);
+margin: 30% auto;
+padding: 20px;
+border: 1px solid var(--primary-color);
+width: 85%;
+border-radius: 15px;
+text-align: center;
+}
+.close-btn {
+color: #aaa;
+float: left;
+font-size: 28px;
+font-weight: bold;
+cursor: pointer;
+}
+
+/* استایل کلمات قابل کلیک در داستان و موزیک /
+.clickable-text {
+line-height: 2;
+font-size: 18px;
+text-align: left; / چون متون انگلیسی هستند */
+direction: ltr;
+}
+.clickable-text span {
+cursor: pointer;
+border-bottom: 1px dashed var(--accent-color);
+padding: 0 2px;
+transition: 0.2s;
+}
+.clickable-text span:hover {
+background-color: rgba(233, 69, 96, 0.3);
+border-radius: 4px;
+}
+
+/* پاپ‌آپ دیکشنری روی کلمات (Tooltip) */
+.word-popup {
+position: fixed;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+background-color: var(--primary-color);
+padding: 20px;
+border-radius: 15px;
+width: 80%;
+text-align: center;
+box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+z-index: 3000;
+}
+.close-popup {
+position: absolute;
+top: 10px;
+left: 15px;
+cursor: pointer;
+font-size: 20px;
+color: white;
+}
+.audio-player {
+width: 100%;
+margin-bottom: 15px;
+}

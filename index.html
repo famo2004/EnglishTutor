@@ -1,52 +1,127 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>اپلیکیشن زبان</title>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        body { font-family: Tahoma; background: #2c3e50; color: white; padding: 20px; }
-        .tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 20px; }
-        .tab-btn { background: #34495e; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; }
-        .tab-btn.active { background: #3498db; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        h1, h2, h3 { color: white !important; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دستیار هوشمند زبان</title>
+<link rel="stylesheet" href="style.css">
+<!-- لینک به فایل مانیفست برای قابلیت نصب به عنوان اپلیکیشن (PWA) -->
+<link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <h1>دستیار هوشمند زبان</h1>
-    <div class="tabs">
-        <button class="tab-btn active" onclick="showTab('mic')">🎤 میکروفون</button>
-        <button class="tab-btn" onclick="showTab('conv')">🗣️ مکالمه</button>
-        <button class="tab-btn" onclick="showTab('exam')">📝 آزمون</button>
-        <button class="tab-btn" onclick="showTab('lib')">📚 کتاب/موزیک</button>
-    </div>
 
-    <div id="mic" class="tab-content active">
-        <button onclick="toggleRecording()">🔴 ضبط/تحلیل</button>
-        <div id="dictSection">
-            <h3>دیکشنری</h3>
-            <input type="text" id="wordInput" placeholder="کلمه را وارد کنید">
-            <button onclick="lookupWord()">جستجو</button>
-        </div>
-    </div>
+<!-- پاپ‌آپ راهنمای نصب برنامه (غیر اجباری) -->
+<div id="installModal" class="modal">
+<div class="modal-content">
+<span class="close-btn" onclick="closeModal('installModal')">×</span>
+<h2 class="page-title">راهنمای نصب اپلیکیشن</h2>
+<p>برای تجربه بهتر و استفاده راحت‌تر، این صفحه را به صفحه اصلی گوشی خود اضافه کنید (Add to Home Screen) تا مانند یک اپلیکیشن مستقل اجرا شود.</p>
+<button onclick="closeModal('installModal')" class="action-btn">متوجه شدم</button>
+</div>
+</div>
 
-    <div id="conv" class="tab-content">
-        <div id="chatWindow" style="height: 300px; overflow-y: scroll;"></div>
-        <input type="text" id="chatInput" placeholder="پیام خود را بنویسید...">
-        <button onclick="sendChatMessage()">ارسال</button>
-    </div>
+<!-- بنر خطای ارتباط با سرور / فیلترشکن -->
+<div id="serverErrorBanner" class="error-banner" style="display: none;">
+خطا در ارتباط با سرور! لطفاً بررسی کنید که اینترنت متصل باشد و یا در صورت نیاز، فیلترشکن (VPN) خود را روشن کنید.
+<button onclick="hideError()" class="close-error">✖</button>
+</div>
 
-    <div id="exam" class="tab-content">
-        <button onclick="startExam()">شروع آزمون روزانه</button>
-        <div id="examArea"></div>
-    </div>
+<!-- منوی تب‌ها -->
+<nav class="tabs-nav">
+<button class="tablink active" onclick="openTab(event, 'MicTab')">🎙️ دستیار صوتی</button>
+<button class="tablink" onclick="openTab(event, 'ConversationTab')">🗣️ مکالمه روزانه</button>
+<button class="tablink" onclick="openTab(event, 'QuizTab')">📝 آزمون روزانه</button>
+<button class="tablink" onclick="openTab(event, 'StoryMusicTab')">📚 داستان و موزیک</button>
+</nav>
 
-    <div id="lib" class="tab-content">
-        <div id="contentList"></div>
-    </div>
+<!-- تب اول: میکروفون و دیکشنری -->
+<div id="MicTab" class="tabcontent" style="display: block;">
+<h2 class="page-title">دستیار صوتی و تحلیلگر هوشمند</h2>
 
-    <script src="app.js"></script>
+<div class="mic-container">
+<p class="guide-text">می‌توانید تا ۱۰ دقیقه به فارسی یا انگلیسی صحبت کنید. (اگر فارسی بگویید انگلیسی تحویل می‌گیرید و اگر انگلیسی بگویید ایرادات شما اصلاح می‌شود)</p>
+<button id="recordBtn" class="action-btn record-btn">🔴 شروع ضبط</button>
+<p id="timerDisplay">00:00</p>
+<div id="responseArea" class="output-box">پاسخ هوش مصنوعی در اینجا نمایش داده می‌شود...</div>
+</div>
+
+<hr class="divider">
+
+<!-- بخش دیکشنری -->
+<div class="dictionary-container">
+<h2 class="page-title">دیکشنری</h2>
+<div class="dict-controls">
+<select id="dictMode" class="dropdown">
+<option value="en-fa">انگلیسی به فارسی</option>
+<option value="fa-en">فارسی به انگلیسی</option>
+<option value="en-en">انگلیسی به انگلیسی</option>
+</select>
+<input type="text" id="dictInput" placeholder="کلمه مورد نظر را وارد کنید..." class="text-input">
+<button id="dictSearchBtn" class="action-btn">جستجو</button>
+</div>
+<div id="dictOutput" class="output-box">معنی کلمه...</div>
+</div>
+</div>
+
+<!-- تب دوم: مکالمه روزانه -->
+<div id="ConversationTab" class="tabcontent">
+<h2 class="page-title">مکالمه روزانه</h2>
+<p class="guide-text">هر چی تا الان یاد گرفتی بیا باهام دربارش صحبت کن! اگر اشتباه هم بگی برات اصلاحش می‌کنم. (پاسخ‌ها با لهجه امریکن پخش می‌شود)</p>
+<button id="startChatBtn" class="action-btn">📞 شروع مکالمه صوتی</button>
+<div id="chatHistory" class="chat-box"></div>
+</div>
+
+<!-- تب سوم: آزمون روزانه -->
+<div id="QuizTab" class="tabcontent">
+<h2 class="page-title">آزمون روزانه (۲۰ سوال)</h2>
+<div class="quiz-settings">
+<label>تعیین کنید ۵۰٪ سوالات از کدام بخش باشد؟</label>
+<select id="quizFocus" class="dropdown">
+<option value="grammar">گرامر (Grammar)</option>
+<option value="pronunciation">تلفظ (Pronunciation)</option>
+<option value="vocabulary">لغات (Vocabulary)</option>
+</select>
+<button id="generateQuizBtn" class="action-btn">شروع آزمون</button>
+</div>
+<div id="quizArea" class="output-box">سوالات جای خالی، تستی، تصویری و تشریحی در اینجا بارگذاری می‌شوند...</div>
+</div>
+
+<!-- تب چهارم: پیشنهاد داستان و موزیک -->
+<div id="StoryMusicTab" class="tabcontent">
+<h2 class="page-title">پیشنهاد داستان و موزیک روزانه</h2>
+<p class="guide-text">روی هر کلمه که معنی آن را نمی‌دانید کلیک کنید تا تلفظ، فونتیک و معنی فارسی آن را ببینید.</p>
+
+<div class="story-section">
+<h3 class="page-title">📖 کتاب داستان امروز</h3>
+<!-- کلمات در جاوا اسکریپت با تگ span پوشانده میشوند تا قابل کلیک باشند -->
+<div id="storyText" class="clickable-text">
+Today is a beautiful day to learn something new. The sun is shining brightly.
+</div>
+</div>
+
+<hr class="divider">
+
+<div class="music-section">
+<h3 class="page-title">🎵 موزیک امروز (همراه با متن)</h3>
+<audio id="dailyMusic" controls class="audio-player">
+<source src="" type="audio/mpeg">
+مرورگر شما از پخش صدا پشتیبانی نمی‌کند.
+</audio>
+<div id="musicLyrics" class="clickable-text">
+I can see clearly now the rain is gone.
+</div>
+</div>
+</div>
+
+<!-- پاپ آپ نمایش معنی کلمات (مخصوص داستان و موزیک) -->
+<div id="wordPopup" class="word-popup" style="display: none;">
+<span class="close-popup" onclick="closeWordPopup()">✖</span>
+<h3 id="popupWord" class="page-title">Word</h3>
+<p id="popupPhonetic">/wɜːrd/</p>
+<p id="popupMeaning">کلمه، واژه</p>
+<button id="popupPronounce" class="action-btn small-btn">🔊 تلفظ</button>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
