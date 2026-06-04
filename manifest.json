@@ -1,10 +1,10 @@
 {
-  "name": "معلم زبان من",
-  "short_name": "EnglishTutor",
-  "start_url": "/",
+  "name": "اپلیکیشن هوشمند زبان",
+  "short_name": "زبان‌آموز",
+  "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#38bdf8",
+  "background_color": "#2c3e50",
+  "theme_color": "#2c3e50",
   "icons": [
     {
       "src": "icon.png",

@@ -2,142 +2,134 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>معلم زبان من</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اپلیکیشن زبان</title>
     <link rel="manifest" href="manifest.json">
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: radial-gradient(circle at 30% 10%, #0a0f2a, #010314); min-height: 100vh; font-family: 'Vazirmatn', system-ui, sans-serif; padding: 16px; padding-bottom: 90px; color: #fff; }
+        /* استایل‌های پایه */
+        body { font-family: Tahoma, Arial, sans-serif; background-color: #2c3e50; color: #ecf0f1; margin: 0; padding: 20px; }
         
-        .glass { max-width: 750px; width: 100%; margin: 0 auto; background: rgba(10, 20, 45, 0.75); backdrop-filter: blur(20px); border-radius: 48px; border: 1px solid rgba(60, 130, 255, 0.5); padding: 20px 18px 28px; box-shadow: 0 20px 35px rgba(0, 0, 0, 0.4); position: relative; }
+        /* سفید کردن تمام تیترها */
+        h1, h2, h3, h4, h5, h6 { color: #ffffff !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
         
-        /* دکمه راهنما در بالا سمت چپ */
-        .help-btn { position: absolute; top: 25px; left: 25px; background: rgba(30, 47, 96, 0.9); border: 1px solid #3b82f6; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 10px #3b82f6; z-index: 10; font-size: 18px; }
-
-        .header { text-align: center; margin-bottom: 18px; padding-bottom: 6px; border-bottom: 1px dashed rgba(90, 150, 255, 0.4); }
-        .header h1 { font-size: clamp(1.2rem, 5vw, 1.5rem); font-weight: 800; background: linear-gradient(135deg, #cae3ff, #b77eff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-
-        .tab-content { display: none; animation: fadeIn 0.3s; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* فرم‌ها و باکس‌ها */
-        .input-box { width: 100%; background: rgba(12, 22, 48, 0.9); border: 1.5px solid rgba(59, 130, 246, 0.7); border-radius: 20px; padding: 12px 18px; font-size: 0.85rem; color: #fff; outline: none; margin-bottom: 15px; font-family: 'Vazirmatn'; }
-        .input-box:focus { box-shadow: 0 0 12px #3b82f6; }
+        /* استایل پنجره‌های هشدار (نصب و فیلترشکن) */
+        .fullscreen-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; text-align: center; backdrop-filter: blur(5px);
+        }
+        .modal-box { background: #ecf0f1; color: #2c3e50; padding: 30px; border-radius: 12px; width: 85%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .modal-box h2 { color: #e74c3c !important; text-shadow: none; }
+        .action-btn { background: #3498db; color: #fff; padding: 12px 25px; border: none; font-size: 16px; cursor: pointer; border-radius: 8px; margin-top: 15px; width: 100%; font-weight: bold;}
         
-        .btn { width: 100%; padding: 12px; border-radius: 60px; font-size: 0.85rem; font-weight: 700; text-align: center; background: linear-gradient(145deg, #2f4685, #19255c); border: 0.5px solid #5a9eff; color: white; cursor: pointer; box-shadow: 0 0 10px #3b82f6; transition: 0.1s; margin-bottom: 15px; }
-        .btn:active { transform: scale(0.97); }
+        /* استایل تب‌ها */
+        .tabs-container { display: flex; gap: 10px; margin-top: 20px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .tab-btn { background: #34495e; color: #ecf0f1; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; transition: 0.3s; font-weight: bold; }
+        .tab-btn:hover { background: #415b76; }
+        .active-tab-btn { background: #3498db; color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4); }
 
-        /* بخش آموزش و کلمات */
-        .teaching-card { background: rgba(20, 32, 60, 0.9); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(80, 140, 255, 0.5); text-align: center; }
-        .word-box { display: inline-flex; flex-direction: column; align-items: center; margin: 8px; cursor: pointer; background: rgba(0, 0, 0, 0.4); padding: 8px 15px; border-radius: 15px; border: 1px solid #3b82f6; }
-        .en-word { font-size: 20px; font-weight: bold; color: #cae3ff; }
-        .ipa { font-size: 12px; color: #7aafff; margin-top: 5px; }
+        /* محتوای تب‌ها */
+        .tab-content { display: none; background: #34495e; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .active-tab-content { display: block; }
 
-        /* میکروفون */
-        .mic-container { text-align: center; margin-top: 20px; }
-        .mic-btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 80px; height: 80px; border-radius: 50%; border: none; font-size: 35px; cursor: pointer; box-shadow: 0 0 20px #3b82f6; transition: 0.2s; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
-        .mic-btn:active { transform: scale(0.9); }
-        .status-text { margin-top: 15px; font-size: 0.85rem; color: #bbd4ff; }
-
-        /* دفتر اشتباهات و فلش‌کارت */
-        .item-card { background: rgba(0, 0, 0, 0.4); border-radius: 20px; padding: 15px; margin-bottom: 10px; border-right: 3px solid #ef4444; text-align: left; direction: ltr; }
-        .item-card.correct { border-right-color: #10b981; margin-top: 5px; background: rgba(16, 185, 129, 0.1); }.flashcard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .flashcard { background: rgba(20, 32, 60, 0.9); border-radius: 20px; padding: 10px; text-align: center; border: 1px solid rgba(80, 140, 255, 0.5); }
-        .flashcard img { width: 100%; height: 100px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
-
-        /* منوی پایین */
-        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: rgba(10, 20, 45, 0.9); backdrop-filter: blur(15px); border-radius: 40px; display: flex; justify-content: space-around; padding: 12px 5px; border: 1px solid rgba(60, 130, 255, 0.5); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; }
-        .nav-item { color: #7aafff; cursor: pointer; font-size: 0.75rem; font-weight: 700; text-align: center; flex: 1; transition: 0.2s; }
-        .nav-item.active { color: #fff; text-shadow: 0 0 10px #3b82f6; transform: translateY(-3px); }
-
-        /* پاپ‌آپ راهنما */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
-        .modal-content { background: rgba(20, 35, 70, 0.95); border: 1px solid #3b82f6; border-radius: 30px; padding: 25px; width: 100%; max-width: 400px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
-        .modal-content h3 { color: #cae3ff; margin-bottom: 15px; border-bottom: 1px solid #3b82f6; padding-bottom: 10px; }
-        .modal-content p { color: #bbd4ff; font-size: 0.85rem; margin-bottom: 10px; line-height: 1.6; }
+        /* دیکشنری */
+        .dictionary-box { margin-top: 30px; padding: 20px; background: #2c3e50; border-radius: 10px; border: 2px dashed #7f8c8d; }
+        .dictionary-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .dict-select, .dict-input { padding: 10px; border-radius: 6px; border: none; font-size: 15px; }
+        .dict-input { flex-grow: 1; }
+        .dict-btn { background: #f39c12; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        #dictResult { margin-top: 15px; font-size: 16px; background: #1a252f; padding: 15px; border-radius: 6px; display: none; }
     </style>
 </head>
 <body>
 
-<div class="glass">
-    <div class="help-btn" onclick="document.getElementById('helpModal').style.display='flex'">❓</div>
-    
-    <div id="tab-learn" class="tab-content active">
-        <div class="header"><h1>𓎂 تمرین هوشمند 𓎂</h1></div>
-        
-        <div class="teaching-card" id="teachingBox">
-            <p style="color: #7aafff; font-size: 0.85rem;">برای شروع، دکمه میکروفون رو بزن و حرف بزن، یا فایلت رو آپلود کن.</p>
-        </div>
-
-        <div class="mic-container">
-            <button class="mic-btn" id="micBtn">🎙️</button>
-            <div class="status-text" id="statusText">آماده دریافت صدای شما...</div>
+    <div id="installModal" class="fullscreen-modal">
+        <div class="modal-box">
+            <h2>📱 نصب اپلیکیشن الزامی است</h2>
+            <p>برای استفاده از امکانات، باید برنامه را نصب کنید.</p>
+            <p style="font-size: 14px; text-align: right;">در اندروید از منوی سه نقطه گزینه <b>Install App</b> و در آیفون از Share گزینه <b>Add to Home Screen</b> را بزنید.</p>
         </div>
     </div>
 
-    <div id="tab-mistakes" class="tab-content">
-        <div class="header"><h1>𓎂 دفتر اشتباهات 𓎂</h1></div>
-        <p style="font-size: 0.75rem; color: #bbd4ff; text-align: center; margin-bottom: 15px;">اشتباهاتت رو اینجا بنویس تا هوش مصنوعی تو تمرینات بعدی ازشون امتحان بگیره!</p>
+    <div id="vpnErrorModal" class="fullscreen-modal">
+        <div class="modal-box">
+            <h2>⚠️ خطای ارتباط</h2>
+            <p>لطفاً فیلترشکن خود را روشن کرده و مجدد تلاش کنید.</p>
+            <button class="action-btn" onclick="location.reload()">تلاش مجدد</button>
+        </div>
+    </div>
+
+    <h1>اپلیکیشن جامع آموزش زبان</h1>
+
+    <div class="tabs-container">
+        <button class="tab-btn active-tab-btn" onclick="switchTab('micTab', this)">🎤 میکروفون و دیکشنری</button>
+        <button class="tab-btn" onclick="switchTab('conversationTab', this)">🗣️ مکالمه</button>
+        <button class="tab-btn" onclick="switchTab('examTab', this)">📝 آزمون</button>
+        <button class="tab-btn" onclick="switchTab('storyTab', this)">📚 داستان</button>
+    </div>
+
+    <div id="micTab" class="tab-content active-tab-content">
+        <h2>بخش ضبط صدا</h2>
+        <button id="recordBtn" class="action-btn" style="background:#e74c3c; width:auto;" onclick="toggleRecording()">🔴 شروع ضبط</button>
+        <p id="recordStatus"></p>
         
-        <input type="text" id="wrongSentence" class="input-box" placeholder="❌ جمله‌ای که اشتباه گفتی...">
-        <input type="text" id="correctSentence" class="input-box" placeholder="✅ شکل درست جمله...">
-        <button class="btn" onclick="saveMistake()">➕ ذخیره در حافظه</button>
-
-        <div id="mistakesList" style="margin-top: 20px;"></div>
+        <div class="dictionary-box">
+            <h3>📖 دیکشنری سریع</h3>
+            <div class="dictionary-controls">
+                <select id="dictMode" class="dict-select"><option value="en-fa">انگلیسی به فارسی</option></select>
+                <input type="text" id="dictInput" class="dict-input" placeholder="کلمه...">
+                <button class="dict-btn" onclick="searchDictionary()">جستجو</button>
+            </div>
+            <div id="dictResult"></div>
+        </div>
     </div>
 
-    <div id="tab-flashcards" class="tab-content">
-        <div class="header"><h1>𓎂 فلش‌کارت‌ها 𓎂</h1></div>
-        <div class="flashcard-grid" id="flashcardsGrid"></div>
-    </div>
+    <div id="conversationTab" class="tab-content"><h2>مکالمه روزانه</h2></div>
+    <div id="examTab" class="tab-content"><h2>آزمون ۲۰ سوالی</h2></div>
+    <div id="storyTab" class="tab-content"><h2>کتاب و موزیک</h2></div>
 
-    <div id="tab-settings" class="tab-content">
-        <div class="header"><h1>𓎂 تنظیمات 𓎂</h1></div>
+    <script>
+        // ۱. راه اندازی اپلیکیشن
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+        const isApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (!isApp) document.getElementById('installModal').style.display = 'flex';
+
+        function showVpnError() { document.getElementById('vpnErrorModal').style.display = 'flex'; }
+
+        // ۲. تب‌ها
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-tab-content'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab-btn'));
+            document.getElementById(tabId).classList.add('active-tab-content');
+            btn.classList.add('active-tab-btn');
+        }
+
+        // ۳. ضبط صدا
+        let mediaRecorder, audioChunks, isRecording = false, recordTimeout;
+        async function toggleRecording() {
+            if (!isRecording) {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    document.getElementById('recordStatus').innerText = "⏳ در حال بررسی...";
+                    showVpnError(); // شبیه‌سازی خطا
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                document.getElementById('recordBtn').innerHTML = "⏹️ توقف ضبط";
+                recordTimeout = setTimeout(stopRecordingAction, 600000);
+            } else { stopRecordingAction(); }
+        }
+        function stopRecordingAction() {
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+            isRecording = false;
+            clearTimeout(recordTimeout);
+            document.getElementById('recordBtn').innerHTML = "🔴 شروع ضبط";
+        }
         
-        <label style="color: #cae3ff; font-size: 0.85rem; margin-bottom: 8px; display: block;">مسیر تخصصی یادگیری شما:</label>
-        <select id="pathSelect" class="input-box">
-            <option value="Daily Conversation & Travel">🌍 سفر، مکالمه روزمره و خرید</option>
-            <option value="Civil Engineering">🏗️ مهندسی عمران و سازه</option>
-            <option value="Web Development & Programming">💻 برنامه‌نویسی و توسعه وب</option>
-            <option value="Architecture & Interior Design">🏛️ معماری و دکوراسیون داخلی</option>
-            <option value="Business & Finance">💼 تجارت، اقتصاد و بورس</option>
-            <option value="IELTS Academic">🎓 آمادگی آزمون آیلتس (آکادمیک)</option>
-            <option value="TOEFL Exam">📝 آمادگی آزمون تافل</option>
-            <option value="Medicine & Healthcare">⚕️ پزشکی، پرستاری و سلامت</option>
-            <option value="Law & Legal">⚖️ حقوق و وکالت</option>
-            <option value="Mechanics & Electronics">⚙️ مهندسی مکانیک و الکترونیک</option>
-            <option value="Art & Photography">🎨 هنر، گرافیک و عکاسی</option>
-            <option value="Data Science & AI">🤖 هوش مصنوعی و تحلیل داده</option>
-            <option value="Psychology">🧠 روانشناسی</option>
-            <option value="Cooking & Culinary">🍳 آشپزی و رستوران‌داری</option>
-            <option value="Immigration & Interview">✈️ مصاحبه سفارت و مهاجرت</option>
-        </select>
-
-        <label style="color: #cae3ff; font-size: 0.85rem; margin-top: 15px; margin-bottom: 8px; display: block;">آپلود جزوه یا فایل تدریس (PDF/عکس):</label>
-        <input type="file" id="fileInput" class="input-box" accept=".pdf, image/*">
-    </div>
-</div>
-
-<div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('learn', this)">🎓<br>تمرین</div>
-    <div class="nav-item" onclick="switchTab('mistakes', this)">📓<br>اشتباهات</div>
-    <div class="nav-item" onclick="switchTab('flashcards', this)">🗂️<br>کارت‌ها</div>
-    <div class="nav-item" onclick="switchTab('settings', this)">⚙️<br>تنظیمات</div>
-</div>
-
-<div class="modal-overlay" id="helpModal">
-    <div class="modal-content">
-        <h3>📖 راهنمای استفاده از برنامه</h3>
-        <p><strong>🎙️ بخش تمرین:</strong> دکمه میکروفون رو بزن و انگلیسی صحبت کن. هوش مصنوعی اشتباهاتت رو می‌گیره، گرامرت رو اصلاح می‌کنه و تلفظ کلمات رو بهت یاد می‌ده.</p>
-        <p><strong>📓 دفتر اشتباهات:</strong> اگر جمله‌ای رو اشتباه گفتی، اینجا با حالت درستش ثبت کن. هوش مصنوعی این لیست رو می‌خونه و تو تمرینات بعدی ازت امتحان می‌گیره تا دیگه یادت نره!</p>
-        <p><strong>🗂️ فلش‌کارت‌ها:</strong> کلمات، اصطلاحات یا ضرب‌المثل‌های جدیدی که تو تمرینات یاد می‌گیری، همراه با عکس هوشمند اینجا ذخیره می‌شن.</p>
-        <p><strong>⚙️ تنظیمات:</strong> می‌تونی حوزه دلخواهت (مثل عمران، برنامه‌نویسی یا سفر) رو انتخاب کنی و حتی جزوه‌های کلاسیت رو آپلود کنی تا برنامه دقیقاً از روی همون فایل‌ها بهت درس بده.</p>
-        <button class="btn" onclick="document.getElementById('helpModal').style.display='none'" style="margin-top: 15px;">متوجه شدم</button>
-    </div>
-</div>
-
-<script src="app.js"></script>
+        function searchDictionary() { alert("در مرحله بعد متصل می‌شود."); }
+    </script>
 </body>
 </html>
