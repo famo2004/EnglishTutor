@@ -248,13 +248,18 @@
                 </div>
 
                 <div class="config-card">
-                    <span class="help-icon" onclick="showHelp('دیکشنری', 'کلمات را جستجو کنید. ما از API جهانی برای دریافت معنی دقیق و مثال‌ها استفاده می‌کنیم.')">❔</span>
-                    <h2 class="page-title" style="font-size: 1rem;">دیکشنری (متصل به API)</h2>
+                    <span class="help-icon" onclick="showHelp('دیکشنری جامع', 'پشتیبانی از ۳ حالت. در تمامی حالات، تلفظ، معنی و مثال انگلیسی استخراج می‌شود.')">❔</span>
+                    <h2 class="page-title" style="font-size: 1rem;">دیکشنری (API جهانی)</h2>
                     <div class="search-box">
-                        <input type="text" id="dictInput" placeholder="کلمه انگلیسی را وارد کنید (مثلا Hello)...">
+                        <select id="dictMode">
+                            <option value="en-fa">انگلیسی به فارسی</option>
+                            <option value="fa-en">فارسی به انگلیسی</option>
+                            <option value="en-en">انگلیسی به انگلیسی</option>
+                        </select>
+                        <input type="text" id="dictInput" placeholder="کلمه خود را وارد کنید...">
                     </div>
                     <button onclick="searchDict()" class="btn-slip">🔍 جستجوی کلمه</button>
-                    <div id="dictOutput" class="config-card" style="background: var(--input-bg); border:none; margin-bottom:0; font-size: 0.8rem; direction: ltr; text-align: left;">معنی کلمه در اینجا نمایش داده می‌شود...</div>
+                    <div id="dictOutput" class="config-card" style="background: var(--input-bg); border:none; margin-bottom:0; font-size: 0.9rem; text-align: right;">معنی و مثال در اینجا نمایش داده می‌شود...</div>
                 </div>
             </div>
 
@@ -401,7 +406,6 @@
     }
 
     function goBackToServices() {
-        // دکمه بازگشت در منوی خدمات به جای خروج از سایت، کلاً برمیگرده عقب
         window.history.back();
     }
 
@@ -515,7 +519,6 @@
         const outBox = document.getElementById('exerciseOutput');
         outBox.style.display = 'block';
         
-        // شافل کردن گزینه‌ها
         const shuffledOptions = ex.options.sort(() => 0.5 - Math.random());
         
         let html = `
@@ -538,14 +541,13 @@
             setTimeout(loadRandomExercise, 2000);
         } else {
             resBox.innerHTML = `<span style="color:var(--error-color)">❌ اشتباه بود. پاسخ صحیح: ${correct}</span><br><span style="color:#88a4d4">به دفتر اشتباهات منتقل شد.</span>`;
-            // ارسال به دفتر اشتباهات
             saveToMistakesDB(wrongFb, correctFb, sentence);
         }
     }
 
     function saveToMistakesDB(wrong, correct, sentence) {
         const currentUser = localStorage.getItem('currentUser');
-        if(!currentUser) return; // اگر لاگین نیست کاری نمیکنه
+        if(!currentUser) return; 
         
         let usersDB = JSON.parse(localStorage.getItem('usersDB'));
         usersDB[currentUser].mistakes.push({ wrong, correct, sentence });
@@ -609,7 +611,7 @@
             if(isLyrics) {
                 let phon = document.createElement('span');
                 phon.className = 'phonetic-mini';
-                phon.innerText = `/${cleanWord.substring(0,3)}/`; // فونتیک دکوری
+                phon.innerText = `/${cleanWord.substring(0,3)}/`; 
                 wrapper.appendChild(phon);
             }
             container.appendChild(wrapper);
@@ -622,7 +624,6 @@
         document.getElementById('modalMean').innerText = mean;
         document.getElementById('modalSpeaker').onclick = () => playAudio(word);
         
-        // دکمه افزودن به اشتباهات
         document.getElementById('addToMistakesBtn').onclick = () => {
             saveToMistakesDB(word, mean, "(کلمه جدید)");
             showToast("به دفتر کلمات/اشتباهات افزوده شد.");
@@ -662,11 +663,9 @@
         const currentUser = localStorage.getItem('currentUser');
         let currentDB = fcData;
 
-        // ادغام کارت‌های دستی کاربر با کارت‌های پیش‌فرض
         if(currentUser) {
             let usersDB = JSON.parse(localStorage.getItem('usersDB'));
             if(usersDB[currentUser].customCards) {
-                // کپی عمیق برای جلوگیری از تغییر دیتای اصلی
                 currentDB = JSON.parse(JSON.stringify(fcData));
                 usersDB[currentUser].customCards.forEach(c => {
                     if(currentDB[c.cat]) currentDB[c.cat].push(c);
@@ -677,7 +676,6 @@
         const cardsArray = currentDB[currentFcCategory] || currentDB['main'];
         if(cardsArray.length === 0) return;
 
-        // جلوگیری از خطای ایندکس
         if(currentCardIndex >= cardsArray.length) currentCardIndex = 0;
         
         const card = cardsArray[currentCardIndex];
@@ -726,7 +724,6 @@
         showToast("فلش‌کارت با موفقیت ساخته شد.");
         document.getElementById('addFcModal').style.display = 'none';
         
-        // پاک کردن فرم
         document.getElementById('newFcWord').value = '';
         document.getElementById('newFcMean').value = '';
         document.getElementById('newFcImg').value = '';
@@ -737,7 +734,7 @@
     setTimeout(loadFlashcard, 500);
 
     // ==========================================
-    // 7. دستیار صوتی (Mock AI) و دیکشنری (Free API)
+    // 7. دستیار صوتی و دیکشنری هوشمند (3 حالته + API)
     // ==========================================
     let timerInterval, seconds = 0, isRecording = false;
     function toggleRecording() {
@@ -761,7 +758,6 @@
             btn.classList.remove('btn-stop');
             out.innerHTML = "⏳ در حال تحلیل صدا توسط هوش مصنوعی...";
             
-            // شبیه‌سازی خروجی هوش مصنوعی پس از پایان ضبط
             setTimeout(() => {
                 out.innerHTML = `
                     <b style="color:#4ade80">تحلیل هوش مصنوعی:</b><br>
@@ -769,36 +765,84 @@
                     <b style="color:#f87171">اشکال گرامری یافت شد.</b><br>
                     شکل صحیح: <b>I am going to the store.</b>
                 `;
-                saveToMistakesDB("I going", "I am going", "to the store."); // خودکار میره تو اشتباهات
+                saveToMistakesDB("I going", "I am going", "to the store."); 
             }, 2500);
         }
     }
 
     async function searchDict() {
         const word = document.getElementById('dictInput').value.trim();
+        const mode = document.getElementById('dictMode').value;
         const output = document.getElementById('dictOutput');
-        if(!word) { output.innerText = "کلمه‌ای وارد نکردید."; return; }
         
-        output.innerText = "در حال جستجو در دیکشنری آنلاین...";
+        if(!word) { output.innerHTML = "❌ کلمه‌ای وارد نکردید."; return; }
+        output.innerHTML = "⏳ در حال جستجو و ترجمه...";
         
         try {
-            // اتصال به API رایگان و واقعی دیکشنری
-            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-            if(!res.ok) throw new Error("کلمه پیدا نشد");
-            const data = await res.json();
+            let enWord = word;
+            let faTranslation = "";
+            let enMeaning = "";
+            let example = "";
+            let phonetic = "";
+
+            // 1. استفاده از MyMemory API برای ترجمه
+            if(mode === 'fa-en') {
+                const res1 = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=fa|en`);
+                const data1 = await res1.json();
+                enWord = data1.responseData.translatedText;
+                faTranslation = word;
+            } else if (mode === 'en-fa') {
+                const res1 = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|fa`);
+                const data1 = await res1.json();
+                faTranslation = data1.responseData.translatedText;
+            }
+
+            // 2. استفاده از Free Dictionary API برای دریافت معنی، مثال و فونتیک انگلیسی
+            try {
+                const res2 = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(enWord)}`);
+                if(res2.ok) {
+                    const data2 = await res2.json();
+                    phonetic = data2[0].phonetic || "";
+                    
+                    // جستجو برای پیدا کردن تعریفی که مثال داشته باشد
+                    const defs = data2[0].meanings[0].definitions;
+                    const defWithExample = defs.find(d => d.example);
+                    
+                    if(defWithExample) {
+                        enMeaning = defWithExample.definition;
+                        example = defWithExample.example;
+                    } else {
+                        enMeaning = defs[0].definition;
+                        example = "مثالی برای این کلمه ثبت نشده است.";
+                    }
+                } else {
+                    enMeaning = "معنی دقیق انگلیسی در دیتابیس یافت نشد.";
+                    example = "نامشخص";
+                }
+            } catch(e) {
+                enMeaning = "خطا در دریافت معنی انگلیسی.";
+                example = "-";
+            }
+
+            // 3. رندر خروجی نهایی
+            let html = `<div style="direction: ltr; text-align: left;">`;
+            html += `<span class="speaker-icon" onclick="playAudio('${enWord}')" style="font-size:1.5rem;">🔊</span> `;
+            html += `<b style="font-size:1.3rem; color:var(--title-color);">${enWord}</b> <span style="color:#a5b4fc; font-family:monospace; margin-left:10px;">${phonetic}</span><br>`;
             
-            const meaning = data[0].meanings[0].definitions[0].definition;
-            const phonetic = data[0].phonetic || "";
+            if(faTranslation && mode !== 'en-en') {
+                html += `<div style="color:var(--correct-color); margin-top:10px; font-weight:bold; direction:rtl; text-align:right;">ترجمه: ${faTranslation}</div>`;
+            }
             
-            output.innerHTML = `
-                <span class="speaker-icon" onclick="playAudio('${word}')">🔊</span>
-                <b>${word}</b> <span style="color:#a5b4fc; font-size:0.8rem">${phonetic}</span><br>
-                <div style="margin-top:10px; border-top:1px dashed #444; padding-top:10px;">
-                    ${meaning}
-                </div>
-            `;
+            html += `<div style="margin-top:15px; border-top:1px dashed var(--border-color); padding-top:15px;">
+                        <b style="color:#8b5cf6;">Meaning:</b> <span style="color:var(--text-color);">${enMeaning}</span><br><br>
+                        <b style="color:#8b5cf6;">Example:</b> <i style="color:#88a4d4;">"${example}"</i>
+                     </div>`;
+            html += `</div>`;
+            
+            output.innerHTML = html;
+
         } catch (err) {
-            output.innerHTML = `<span style="color:var(--error-color)">❌ کلمه در دیتابیس یافت نشد.</span>`;
+            output.innerHTML = `<span style="color:var(--error-color)">❌ خطا در ارتباط با سرور ترجمه/دیکشنری. بررسی کنید اینترنت متصل باشد.</span>`;
         }
     }
 
@@ -808,7 +852,9 @@
     const quizDB = [
         { q: "You ______ better see a doctor.", options: ["had", "have", "has"], ans: "had" },
         { q: "She is interested ______ art.", options: ["in", "on", "at"], ans: "in" },
-        { q: "I look forward to ______ you.", options: ["see", "seeing", "saw"], ans: "seeing" }
+        { q: "I look forward to ______ you.", options: ["see", "seeing", "saw"], ans: "seeing" },
+        { q: "They ______ playing football now.", options: ["is", "are", "am"], ans: "are" },
+        { q: "It is the ______ movie I have ever seen.", options: ["good", "better", "best"], ans: "best" }
     ];
     let currentQuizIndex = 0;
     let quizScore = 0;
@@ -823,14 +869,14 @@
 
     function loadQuizQuestion() {
         if(currentQuizIndex >= quizDB.length) {
-            document.getElementById('quizArea').innerHTML = `<h3 style="text-align:center;">پایان آزمون 🎉<br>نمره شما: ${quizScore} از ${quizDB.length}</h3>`;
+            document.getElementById('quizArea').innerHTML = `<h3 style="text-align:center; color:var(--title-color);">پایان آزمون 🎉<br>نمره شما: ${quizScore} از ${quizDB.length}</h3>`;
             document.getElementById('startQuizBtn').style.display = 'block';
             document.getElementById('startQuizBtn').innerText = 'تکرار آزمون';
             return;
         }
 
         const qData = quizDB[currentQuizIndex];
-        let html = `<div style="font-weight:bold; margin-bottom:15px;">${currentQuizIndex+1}. ${qData.q}</div><div class="exercise-options">`;
+        let html = `<div style="font-weight:bold; margin-bottom:15px; color:var(--title-color);">${currentQuizIndex+1}. ${qData.q}</div><div class="exercise-options">`;
         
         qData.options.forEach(opt => {
             html += `<button class="ex-opt-btn" onclick="checkQuizAnswer('${opt}', '${qData.ans}', '${qData.q}')">${opt}</button>`;
@@ -920,7 +966,7 @@
         else document.body.classList.remove('light-theme');
         
         checkLoginStatus();
-        loadFlashcard(); // لود مجدد کارت‌ها برای اعمال کارت‌های کاستوم این یوزر
+        loadFlashcard();
     }
 
     function handleLogout() {
@@ -966,7 +1012,7 @@
 
     window.onload = () => { 
         checkLoginStatus(); 
-        history.pushState({page: 'ServicesPage'}, "", "#ServicesPage"); // اینیشیالایز کردن هیستوری
+        history.pushState({page: 'ServicesPage'}, "", "#ServicesPage");
     };
 
     function showHelp(title, desc) {
