@@ -1,6 +1,7 @@
 self.addEventListener('install', (e) => {
-  console.log('Service Worker نصب شد.');
+    self.skipWaiting();
 });
+
 self.addEventListener('fetch', (e) => {
-  // کدهای مربوط به کش کردن آفلاین در اینجا قرار می‌گیرد
+    e.respondWith(caches.match(e.request).then(response => response || fetch(e.request)));
 });

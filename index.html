@@ -2,134 +2,51 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>اپلیکیشن زبان</title>
     <link rel="manifest" href="manifest.json">
-    
     <style>
-        /* استایل‌های پایه */
-        body { font-family: Tahoma, Arial, sans-serif; background-color: #2c3e50; color: #ecf0f1; margin: 0; padding: 20px; }
-        
-        /* سفید کردن تمام تیترها */
-        h1, h2, h3, h4, h5, h6 { color: #ffffff !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-        
-        /* استایل پنجره‌های هشدار (نصب و فیلترشکن) */
-        .fullscreen-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; text-align: center; backdrop-filter: blur(5px);
-        }
-        .modal-box { background: #ecf0f1; color: #2c3e50; padding: 30px; border-radius: 12px; width: 85%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .modal-box h2 { color: #e74c3c !important; text-shadow: none; }
-        .action-btn { background: #3498db; color: #fff; padding: 12px 25px; border: none; font-size: 16px; cursor: pointer; border-radius: 8px; margin-top: 15px; width: 100%; font-weight: bold;}
-        
-        /* استایل تب‌ها */
-        .tabs-container { display: flex; gap: 10px; margin-top: 20px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .tab-btn { background: #34495e; color: #ecf0f1; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; transition: 0.3s; font-weight: bold; }
-        .tab-btn:hover { background: #415b76; }
-        .active-tab-btn { background: #3498db; color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4); }
-
-        /* محتوای تب‌ها */
-        .tab-content { display: none; background: #34495e; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .active-tab-content { display: block; }
-
-        /* دیکشنری */
-        .dictionary-box { margin-top: 30px; padding: 20px; background: #2c3e50; border-radius: 10px; border: 2px dashed #7f8c8d; }
-        .dictionary-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
-        .dict-select, .dict-input { padding: 10px; border-radius: 6px; border: none; font-size: 15px; }
-        .dict-input { flex-grow: 1; }
-        .dict-btn { background: #f39c12; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        #dictResult { margin-top: 15px; font-size: 16px; background: #1a252f; padding: 15px; border-radius: 6px; display: none; }
+        body { font-family: Tahoma; background: #2c3e50; color: white; padding: 20px; }
+        .tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 20px; }
+        .tab-btn { background: #34495e; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; }
+        .tab-btn.active { background: #3498db; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        h1, h2, h3 { color: white !important; }
     </style>
 </head>
 <body>
+    <h1>دستیار هوشمند زبان</h1>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('mic')">🎤 میکروفون</button>
+        <button class="tab-btn" onclick="showTab('conv')">🗣️ مکالمه</button>
+        <button class="tab-btn" onclick="showTab('exam')">📝 آزمون</button>
+        <button class="tab-btn" onclick="showTab('lib')">📚 کتاب/موزیک</button>
+    </div>
 
-    <div id="installModal" class="fullscreen-modal">
-        <div class="modal-box">
-            <h2>📱 نصب اپلیکیشن الزامی است</h2>
-            <p>برای استفاده از امکانات، باید برنامه را نصب کنید.</p>
-            <p style="font-size: 14px; text-align: right;">در اندروید از منوی سه نقطه گزینه <b>Install App</b> و در آیفون از Share گزینه <b>Add to Home Screen</b> را بزنید.</p>
+    <div id="mic" class="tab-content active">
+        <button onclick="toggleRecording()">🔴 ضبط/تحلیل</button>
+        <div id="dictSection">
+            <h3>دیکشنری</h3>
+            <input type="text" id="wordInput" placeholder="کلمه را وارد کنید">
+            <button onclick="lookupWord()">جستجو</button>
         </div>
     </div>
 
-    <div id="vpnErrorModal" class="fullscreen-modal">
-        <div class="modal-box">
-            <h2>⚠️ خطای ارتباط</h2>
-            <p>لطفاً فیلترشکن خود را روشن کرده و مجدد تلاش کنید.</p>
-            <button class="action-btn" onclick="location.reload()">تلاش مجدد</button>
-        </div>
+    <div id="conv" class="tab-content">
+        <div id="chatWindow" style="height: 300px; overflow-y: scroll;"></div>
+        <input type="text" id="chatInput" placeholder="پیام خود را بنویسید...">
+        <button onclick="sendChatMessage()">ارسال</button>
     </div>
 
-    <h1>اپلیکیشن جامع آموزش زبان</h1>
-
-    <div class="tabs-container">
-        <button class="tab-btn active-tab-btn" onclick="switchTab('micTab', this)">🎤 میکروفون و دیکشنری</button>
-        <button class="tab-btn" onclick="switchTab('conversationTab', this)">🗣️ مکالمه</button>
-        <button class="tab-btn" onclick="switchTab('examTab', this)">📝 آزمون</button>
-        <button class="tab-btn" onclick="switchTab('storyTab', this)">📚 داستان</button>
+    <div id="exam" class="tab-content">
+        <button onclick="startExam()">شروع آزمون روزانه</button>
+        <div id="examArea"></div>
     </div>
 
-    <div id="micTab" class="tab-content active-tab-content">
-        <h2>بخش ضبط صدا</h2>
-        <button id="recordBtn" class="action-btn" style="background:#e74c3c; width:auto;" onclick="toggleRecording()">🔴 شروع ضبط</button>
-        <p id="recordStatus"></p>
-        
-        <div class="dictionary-box">
-            <h3>📖 دیکشنری سریع</h3>
-            <div class="dictionary-controls">
-                <select id="dictMode" class="dict-select"><option value="en-fa">انگلیسی به فارسی</option></select>
-                <input type="text" id="dictInput" class="dict-input" placeholder="کلمه...">
-                <button class="dict-btn" onclick="searchDictionary()">جستجو</button>
-            </div>
-            <div id="dictResult"></div>
-        </div>
+    <div id="lib" class="tab-content">
+        <div id="contentList"></div>
     </div>
 
-    <div id="conversationTab" class="tab-content"><h2>مکالمه روزانه</h2></div>
-    <div id="examTab" class="tab-content"><h2>آزمون ۲۰ سوالی</h2></div>
-    <div id="storyTab" class="tab-content"><h2>کتاب و موزیک</h2></div>
-
-    <script>
-        // ۱. راه اندازی اپلیکیشن
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-        const isApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-        if (!isApp) document.getElementById('installModal').style.display = 'flex';
-
-        function showVpnError() { document.getElementById('vpnErrorModal').style.display = 'flex'; }
-
-        // ۲. تب‌ها
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-tab-content'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab-btn'));
-            document.getElementById(tabId).classList.add('active-tab-content');
-            btn.classList.add('active-tab-btn');
-        }
-
-        // ۳. ضبط صدا
-        let mediaRecorder, audioChunks, isRecording = false, recordTimeout;
-        async function toggleRecording() {
-            if (!isRecording) {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = async () => {
-                    document.getElementById('recordStatus').innerText = "⏳ در حال بررسی...";
-                    showVpnError(); // شبیه‌سازی خطا
-                };
-                mediaRecorder.start();
-                isRecording = true;
-                document.getElementById('recordBtn').innerHTML = "⏹️ توقف ضبط";
-                recordTimeout = setTimeout(stopRecordingAction, 600000);
-            } else { stopRecordingAction(); }
-        }
-        function stopRecordingAction() {
-            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
-            isRecording = false;
-            clearTimeout(recordTimeout);
-            document.getElementById('recordBtn').innerHTML = "🔴 شروع ضبط";
-        }
-        
-        function searchDictionary() { alert("در مرحله بعد متصل می‌شود."); }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
